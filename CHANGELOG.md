@@ -6,6 +6,12 @@ X.Y.Z
 - Z: minor or patch
 
 -----------------------------------------
+1.30.3
+- Fix bug when disable OTP for local users
+
+1.29.4
+- Fix bug when disable OTP for local users
+
 1.30.2
 - Update dependencies
 

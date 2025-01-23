@@ -36,14 +36,13 @@ use OCP\IL10N;
 use OCP\IRequest;
 use OCP\IURLGenerator;
 use OCP\IUser;
+use OCP\IUserBackend;
 use OCP\IUserManager;
 use OCP\Template;
 use OCP\Util;
 use Psr\Log\LoggerInterface;
 
-class OpenOTPsendRequestException extends Exception
-{
-}
+class OpenOTPsendRequestException extends Exception {}
 
 class TwoFactorRCDevsOpenOTPProvider implements IProvider
 {
@@ -353,8 +352,8 @@ class TwoFactorRCDevsOpenOTPProvider implements IProvider
 		// 0 => AUTHENTICATION_METHOD_STD (Standard)
 		// 1 => AUTHENTICATION_METHOD_OTP (OTP)
 
-		// if ($disable_otp_local_users === "on" && $user->getBackend()->getBackendName() === "Database") {
-		if ($disable_otp_local_users === "on") {
+		$backend = $user->getBackend();
+		if ($disable_otp_local_users === "on" && $backend instanceof IUserBackend && $backend->getBackendName() !== 'LDAP') {
 			$this->logger->info("2FA NOT ACTIVED", array('app' => OpenOTPAuthApp::APP_ID));
 			return false;
 		}

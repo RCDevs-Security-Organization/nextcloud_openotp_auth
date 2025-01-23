@@ -1,4 +1,4 @@
-![](https://codeberg.org/rcdevs/nextcloud_openotp_auth/raw/branch/main/assets/OpenOTP%20Auth.png)
+![](https://docs.rcdevs.com/pictures/logo/rcdevs/nextcloud/openotp_auth_169x169.png)
 
 **RCDevs OpenOTP Application enables two-factor authentication for your users using your personal Cloud.**
 
@@ -27,4 +27,4 @@ On this repository, please consult the different branches corresponding to the v
 
 Do not hesitate to contact us at https://www.rcdevs.com
 
-![](https://codeberg.org/rcdevs/nextcloud_openotp_auth/raw/branch/main/assets/RCDevs%20Security.png)
+![](https://docs.rcdevs.com/pictures/logo/rcdevs/nextcloud/rcdevs_115x54.png)
