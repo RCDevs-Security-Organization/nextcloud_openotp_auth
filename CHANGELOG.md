@@ -6,6 +6,12 @@ X.Y.Z
 - Z: minor or patch
 
 -----------------------------------------
+1.30.4
+- Improvement display on OTP challenge : on label, first displayed is "DisplayName"; if null "EMailAddress"; if null "UID"
+
+1.29.5
+- Improvement display on OTP challenge : on label, first displayed is "DisplayName"; if null "EMailAddress"; if null "UID"
+
 1.30.3
 - Fix bug when disable OTP for local users
 

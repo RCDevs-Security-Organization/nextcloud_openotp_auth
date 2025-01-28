@@ -271,7 +271,10 @@ class TwoFactorRCDevsOpenOTPProvider implements IProvider
 		}
 
 		$template = new Template(OpenOTPAuthApp::APP_ID, 'challenge');
-		$template->assign("userID", $user->getUID());
+		$template->assign(
+			"userID",
+			$user->getDisplayName() ?? $user->getEMailAddress() ?? $user->getUID()
+		);
 		$template->assign("status", $this->openOTPsendRequestStatus);
 		$template->assign("error_msg", isset($error_message) ? $error_message : "");
 		$template->assign("challenge_params", $this->challenge_params);
