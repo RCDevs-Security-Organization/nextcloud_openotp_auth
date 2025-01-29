@@ -6,6 +6,9 @@ X.Y.Z
 - Z: minor or patch
 
 -----------------------------------------
+1.30.5
+- Issue during signature and packaging process: the improvement has been erased by old code.
+
 1.30.4
 - Improvement display on OTP challenge : on label, first displayed is "DisplayName"; if null "EMailAddress"; if null "UID"
 
