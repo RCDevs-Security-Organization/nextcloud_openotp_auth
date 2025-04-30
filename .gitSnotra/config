@@ -1,0 +1,12 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	worktree = /var/www/html/dev/dev_nextcloud_30_0_x/apps/openotp_auth
+[remote "origin"]
+	url = git@snotra:RCDevs/openotp_auth.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "N30"]
+	remote = origin
+	merge = refs/heads/N30
