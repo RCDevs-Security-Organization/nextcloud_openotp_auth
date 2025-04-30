@@ -1,5 +1,5 @@
 /**
- * @copyright Copyright (c) 2024, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -28,7 +28,7 @@ webpackConfig.entry['settings'] = path.join(__dirname, 'src', 'main-settings.js'
 webpackConfig.entry['login-setup'] = path.join(__dirname, 'src', 'main-login-setup.js')
 webpackConfig.entry['admin-settings'] = path.join(__dirname, 'src', 'admin-settings.js')
 
-// 🔧 Ajouter l'extension .js comme fallback pour les imports ESM fully-specified
+// Add .js extension as fallback for fully-specified ESM imports
 webpackConfig.resolve = {
 	...webpackConfig.resolve,
 	extensions: ['.js', '.vue', '.json'],
@@ -43,7 +43,7 @@ webpackConfig.resolve = {
 	}
 }
 
-// 🧩 Fournir les polyfills Node.js
+// Providing Node.js polyfills
 webpackConfig.plugins = [
 	...(webpackConfig.plugins || []),
 	new webpack.ProvidePlugin({
@@ -52,7 +52,7 @@ webpackConfig.plugins = [
 	})
 ]
 
-// ✅ Important : désactiver la concaténation des modules pour éviter les bugs avec ESM
+// Important: disable module concatenation to avoid bugs with ESM
 webpackConfig.optimization = {
 	...webpackConfig.optimization,
 	concatenateModules: false

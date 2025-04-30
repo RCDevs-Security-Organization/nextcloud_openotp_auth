@@ -3,7 +3,7 @@
 	<id>openotp_auth</id>
 	<name>OpenOTP Auth</name>
 	<summary>OpenOTP two-factor provider</summary>
-    <description>
+	<description>
 **RCDevs OpenOTP Application enables two-factor authentication for your users using your personal Cloud.**
 
 It is versatile, device-independent and based on opened security standards.
@@ -23,7 +23,8 @@ It is enterprise-ready with strong support for:
 * easy installation, update and configuration in RCDevs WebADM
 * ... and much more.
 	</description>
-			<version>1.31.0</version>
+
+	<version>1.31.1</version>
 	<licence>agpl</licence>
 	<author>RCDevs</author>
 	<namespace>OpenOTPAuth</namespace>
@@ -37,7 +38,7 @@ It is enterprise-ready with strong support for:
 	<screenshot>https://raw.githubusercontent.com/rcdevs/nextcloud_openotp_auth/N31/screenshots/openotp_auth_fido2.png</screenshot>
 
 	<dependencies>
-		<php min-version="8.0" max-version="8.3"/>
+		<php min-version="8.2" max-version="8.3"/>
 		<nextcloud min-version="31" max-version="31"/>
 	</dependencies>
 
