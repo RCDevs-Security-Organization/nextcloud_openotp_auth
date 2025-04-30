@@ -1,5 +1,5 @@
 /**
- * @copyright Copyright (c) 2024, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -18,12 +18,44 @@
  */
 
 const path = require('path')
+const webpack = require('webpack')
 const webpackConfig = require('@nextcloud/webpack-vue-config')
 
+// Supprimer l’entrée par défaut
 delete webpackConfig.entry['main']
-webpackConfig.entry['challenge']		= path.join(__dirname, 'src', 'main-challenge.js')
-webpackConfig.entry['settings']			= path.join(__dirname, 'src', 'main-settings.js')
-webpackConfig.entry['login-setup']		= path.join(__dirname, 'src', 'main-login-setup.js')
-webpackConfig.entry['admin-settings']	= path.join(__dirname, 'src', 'admin-settings.js');
+webpackConfig.entry['challenge'] = path.join(__dirname, 'src', 'main-challenge.js')
+webpackConfig.entry['settings'] = path.join(__dirname, 'src', 'main-settings.js')
+webpackConfig.entry['login-setup'] = path.join(__dirname, 'src', 'main-login-setup.js')
+webpackConfig.entry['admin-settings'] = path.join(__dirname, 'src', 'admin-settings.js')
+
+// Add .js extension as fallback for fully-specified ESM imports
+webpackConfig.resolve = {
+	...webpackConfig.resolve,
+	extensions: ['.js', '.vue', '.json'],
+	alias: {
+		...(webpackConfig.resolve?.alias || {}),
+		'process/browser': require.resolve('process/browser.js')
+	},
+	fallback: {
+		...webpackConfig.resolve?.fallback,
+		process: require.resolve('process/browser.js'),
+		buffer: require.resolve('buffer/')
+	}
+}
+
+// Providing Node.js polyfills
+webpackConfig.plugins = [
+	...(webpackConfig.plugins || []),
+	new webpack.ProvidePlugin({
+		process: 'process/browser',
+		Buffer: ['buffer', 'Buffer']
+	})
+]
+
+// Important: disable module concatenation to avoid bugs with ESM
+webpackConfig.optimization = {
+	...webpackConfig.optimization,
+	concatenateModules: false
+}
 
 module.exports = webpackConfig

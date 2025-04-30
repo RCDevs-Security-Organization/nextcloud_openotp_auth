@@ -1,6 +1,6 @@
 <!--
  *
- * @copyright Copyright (c) 2024, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *

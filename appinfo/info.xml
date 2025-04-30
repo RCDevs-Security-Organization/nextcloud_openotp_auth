@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
-<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
-      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 	<id>openotp_auth</id>
 	<name>OpenOTP Auth</name>
 	<summary>OpenOTP two-factor provider</summary>
-    <description>
+	<description>
 **RCDevs OpenOTP Application enables two-factor authentication for your users using your personal Cloud.**
 
 It is versatile, device-independent and based on opened security standards.
@@ -16,7 +15,7 @@ It is enterprise-ready with strong support for:
 * high-availability
 * load-balancing
 * multi-tenancy
-* geolocalization
+* geolocation
 * delegated administration
 * contextual authentication with IP address and device fingerprint
 * push Login technology with Mobile Phone
@@ -24,7 +23,8 @@ It is enterprise-ready with strong support for:
 * easy installation, update and configuration in RCDevs WebADM
 * ... and much more.
 	</description>
-			<version>1.30.5</version>
+
+	<version>1.30.6</version>
 	<licence>agpl</licence>
 	<author>RCDevs</author>
 	<namespace>OpenOTPAuth</namespace>
@@ -38,8 +38,8 @@ It is enterprise-ready with strong support for:
 	<screenshot>https://raw.githubusercontent.com/rcdevs/nextcloud_openotp_auth/N30/screenshots/openotp_auth_fido2.png</screenshot>
 
 	<dependencies>
-		<php min-version="8.0" max-version="8.3"/>
-		<nextcloud min-version="30" max-version="30" />
+		<php min-version="8.2" max-version="8.3"/>
+		<nextcloud min-version="30" max-version="30"/>
 	</dependencies>
 
 	<two-factor-providers>

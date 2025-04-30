@@ -1,3 +1,4 @@
-0000000000000000000000000000000000000000 3aea4eeafac9a688b95bde5c0ec5b153b9839a29 eric <eric.james@bayssette.fr> 1746004052 +0200	commit (initial): 1.30.6
-3aea4eeafac9a688b95bde5c0ec5b153b9839a29 db83392ba58fd1ff7ff57afb8da900f90bf88c6b eric <eric.james@bayssette.fr> 1746004394 +0200	checkout: moving from main to N30
-db83392ba58fd1ff7ff57afb8da900f90bf88c6b db83392ba58fd1ff7ff57afb8da900f90bf88c6b eric <eric.james@bayssette.fr> 1746004396 +0200	checkout: moving from N30 to N30
+0000000000000000000000000000000000000000 ee63c417ee6fa8739a1944bf7431b148d78a51b6 eric <eric.james@bayssette.fr> 1746016552 +0200	clone: from github.com:RCDevs-Security-Organization/nextcloud_openotp_auth.git
+ee63c417ee6fa8739a1944bf7431b148d78a51b6 add8f72b55170468408e1f1aaf74d6605066ec56 eric <eric.james@bayssette.fr> 1746016566 +0200	checkout: moving from main to N30
+add8f72b55170468408e1f1aaf74d6605066ec56 add8f72b55170468408e1f1aaf74d6605066ec56 eric <eric.james@bayssette.fr> 1746019292 +0200	checkout: moving from N30 to N30
+add8f72b55170468408e1f1aaf74d6605066ec56 add8f72b55170468408e1f1aaf74d6605066ec56 eric <eric.james@bayssette.fr> 1746019293 +0200	checkout: moving from N30 to N30
