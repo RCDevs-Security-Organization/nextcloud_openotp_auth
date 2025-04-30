@@ -1,5 +1,0 @@
-0000000000000000000000000000000000000000 edb1c98936987de2270544067949afc4daeb3b31 eric <eric.james@bayssette.fr> 1746016112 +0200	clone: from ssh://codeberg.org/RCDevs-Security-Organization/nextcloud_openotp_auth.git
-edb1c98936987de2270544067949afc4daeb3b31 9a5497cbd51b16217954a81f1c3d4a73a37681e3 eric <eric.james@bayssette.fr> 1746016124 +0200	checkout: moving from main to N30
-9a5497cbd51b16217954a81f1c3d4a73a37681e3 9a5497cbd51b16217954a81f1c3d4a73a37681e3 eric <eric.james@bayssette.fr> 1746019378 +0200	checkout: moving from N30 to N30
-9a5497cbd51b16217954a81f1c3d4a73a37681e3 9a5497cbd51b16217954a81f1c3d4a73a37681e3 eric <eric.james@bayssette.fr> 1746019379 +0200	checkout: moving from N30 to N30
-9a5497cbd51b16217954a81f1c3d4a73a37681e3 22a935def72dd73352a9270a23a8ea9c65c38916 eric <eric.james@bayssette.fr> 1746019379 +0200	commit: 1.30.6
