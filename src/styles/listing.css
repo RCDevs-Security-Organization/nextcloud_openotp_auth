@@ -1,0 +1,326 @@
+.opaMainContainer {
+	/* background-color: #f6f6f6; */
+}
+
+.component-container {
+	background-color: #f6f6f6;
+	border-radius: 28px;
+	padding: 14px 28px 14px 28px;
+	margin: 10px;
+}
+
+
+.component-container:nth-of-type(2n) {
+	margin-top: 28px;
+}
+
+PendingTitle,
+IssueTitle {
+	border-bottom: solid lightgray 1px;
+	justify-content: center;
+	display: flex;
+	font-size: 20px;
+	font-weight: bold;
+	padding-bottom: 10px;
+}
+
+.empty-content {
+	margin-top: 0px;
+}
+
+table.listings {
+	width: 100%;
+	white-space: normal;
+	table-layout: fixed;
+}
+
+table.listings>thead>tr {
+	/* height: 66px; */
+	background-color: var(--color-border-dark);
+	color: var(--color-text-maxcontrast);
+}
+
+table.listings td,
+table.listings th {
+	vertical-align: top;
+	padding: .8em;
+	text-align: left;
+	font-weight: normal;
+	position: relative;
+	word-wrap: break-word;
+	border-bottom: 1px solid var(--color-border);
+}
+
+th.level.active .log-settings-toggle,
+th.level:hover .log-settings-toggle {
+	opacity: 1;
+}
+
+.time {
+	width: 220px;
+
+	>span {
+		margin: -0.8em;
+		padding: .8em;
+		display: block;
+		width: 100%;
+		height: 100%;
+		cursor: pointer;
+	}
+}
+
+.time.relative {
+	width: 120px;
+
+	>span {
+		margin: -0.8em;
+		padding: .8em;
+		display: block;
+		width: 100%;
+		height: 100%;
+		cursor: pointer;
+	}
+}
+
+.level {
+	width: 100px;
+}
+
+/* warning*/
+
+.level_2 td.level {
+	border-left: 5px solid #FEEFB3;
+}
+
+/*error*/
+
+.level_3 td.level {
+	border-left: 5px solid #FFBABA;
+}
+
+/*fatal*/
+
+.level_4 td.level {
+	border-left: 5px solid #ff8080;
+}
+
+div.column {
+	box-sizing: border-box;
+	padding: 7px;
+}
+
+div.level {
+	font-weight: bold;
+}
+
+div.level,
+div.time {
+	display: inline-block;
+	width: 33%;
+}
+
+div.time {
+	padding-right: 20px;
+}
+
+div.row {
+	position: relative;
+}
+
+div.message {
+	border-bottom: 1px solid var(--color-border);
+}
+
+td.copy,
+th.copy {
+	position: relative;
+	width: 42px;
+	margin: 0;
+	overflow: visible;
+
+	button {
+		position: relative;
+		opacity: 0;
+		transition: opacity 0.5s;
+		top: -5px;
+		padding: 0;
+		background-color: transparent;
+		border: none;
+		width: 42px;
+	}
+}
+
+tr:hover {
+	td.copy button {
+		opacity: 0.5;
+
+		&:hover {
+			opacity: 1;
+		}
+	}
+}
+
+tr.active td.copy button {
+	opacity: 1;
+}
+
+div.level_2 {
+	border-left: 5px solid #FEEFB3;
+}
+
+div.level_3 {
+	border-left: 5px solid #FFBABA;
+}
+
+div.level_4 {
+	border-left: 5px solid #ff8080;
+}
+
+tr.empty td {
+	border-bottom: none;
+}
+
+tr.highlight {
+	background-color: var(--color-background-hover);
+}
+
+.smallHeader,
+th.level {
+	overflow: visible;
+
+	margin: -0.8em;
+	padding: .8em;
+	height: 100%;
+	cursor: pointer;
+
+	.log-settings-toggle {
+		cursor: pointer;
+		display: block;
+		float: right;
+		margin: 2px;
+		opacity: 0.5;
+		transition: opacity 0.2s;
+	}
+}
+
+.smallHeader {
+	margin-left: 44px;
+	width: 62px;
+	padding: 10px;
+
+	.log-settings-toggle:hover {
+		opacity: 1;
+	}
+}
+
+.copyMenu {
+	right: -10px;
+	top: 50px;
+	width: auto;
+}
+
+.recipient-delete {
+	display: inline-block;
+	vertical-align: middle;
+	background-size: 16px 16px;
+	background-image: var(--icon-delete-dark);
+	margin-top: -4px;
+	padding: 12px;
+	background-repeat: no-repeat;
+	background-position: center center;
+	cursor: pointer;
+}
+
+.multipleRows {
+	display: block;
+	vertical-align: middle;
+	padding-bottom: 22px;
+}
+
+
+
+
+
+
+/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+.flex-container {
+	display: flex;
+}
+
+.flex-child {
+	flex: 1;
+	border: 2px solid yellow;
+}
+
+.flex-child:first-child {
+	margin-right: 20px;
+}
+
+.app-container {
+	margin-top: 0px;
+	display: flex;
+	width: 100%;
+}
+
+.opaMainContainer>>>h1 {
+	font-size: 2em;
+	text-align: center;
+}
+
+.opaMainContainer>>>img {
+	display: block;
+	margin: 25px auto;
+}
+
+.opaMainContainer>>>td img {
+	margin: 0 auto;
+}
+
+paginationFlexContainer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.paginationContainer {
+	display: inline-block;
+}
+
+.paginationContainer .paginationPage {
+	float: left;
+	padding: 8px 16px;
+	text-decoration: none;
+	border: 1px solid var(--color-border);
+}
+
+.paginationContainer .paginationPage.active {
+	background-color: var(--color-primary-element);
+	color: var(--color-primary-element-text);
+	border: 1px solid var(--color-border);
+}
+
+.paginationContainer .paginationPage.active a {
+	color: var(--color-primary-element-text);
+}
+
+.paginationContainer .paginationPage:not(.active):hover {
+	background-color: var(--color-background-dark);
+}
+
+.paginationContainer .paginationPage:first-child {
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+
+.paginationContainer .paginationPage:last-child {
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.paginationPage.disabled {
+	background-color: var(--color-primary-element-light);
+}
+
+td.cancelButton {
+	text-align: right;
+}

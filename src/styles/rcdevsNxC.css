@@ -1,0 +1,28 @@
+:root {
+	--color-success-front: #30b471;
+	--color-warning: #c69347;
+	--color-error-front: #721c24;
+	--color-error-back: #f8d7da;
+	--color-error-border: #f5c6cb;
+
+}
+
+.rcdevsLogo {
+	height: 44px;
+	left: 15px;
+	position: absolute;
+	top: 15px;
+	width: 96px;
+}
+
+.rcdevsLogo img {
+	object-fit: contain;
+}
+
+greenTick {
+	display: inline-block;
+	font-size: 150px;
+	color: green;
+	margin-top: 100px;
+	margin-bottom: 100px;
+}

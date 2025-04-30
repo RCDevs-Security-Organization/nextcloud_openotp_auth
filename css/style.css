@@ -1,0 +1,23 @@
+/**
+ * Nextcloud - WebAuthn 2FA
+ *
+ * This file is licensed under the Affero General Public License version 3 or
+ * later. See the COPYING file.
+ *
+ * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Michael Blumenstein <M.Flower@gmx.de>
+ */
+
+/** icons for personal page settings **/
+.nav-icon-webauthn-second-factor-auth, .icon-webauthn-device {
+	background-image: url('../img/app-dark.svg?v=1');
+}
+
+body.theme--dark .nav-icon-webauthn-second-factor-auth,
+body.theme--dark .icon-webauthn-device {
+	background-image: url('../img/app.svg?v=1');
+}
+
+#webauthn-http-warning {
+	color: var(--color-warning);
+}
