@@ -24,7 +24,7 @@ It is enterprise-ready with strong support for:
 * ... and much more.
 	</description>
 
-	<version>1.31.1</version>
+	<version>1.31.2</version>
 	<licence>agpl</licence>
 	<author>RCDevs</author>
 	<namespace>OpenOTPAuth</namespace>
@@ -38,7 +38,7 @@ It is enterprise-ready with strong support for:
 	<screenshot>https://raw.githubusercontent.com/rcdevs/nextcloud_openotp_auth/N31/screenshots/openotp_auth_fido2.png</screenshot>
 
 	<dependencies>
-		<php min-version="8.2" max-version="8.3"/>
+		<php min-version="8.2" max-version="8.4"/>
 		<nextcloud min-version="31" max-version="31"/>
 	</dependencies>
 
@@ -51,12 +51,12 @@ It is enterprise-ready with strong support for:
 		<admin-section>OCA\OpenOTPAuth\Settings\Admin\AdminSection</admin-section>
 	</settings>
 
-	<activity>
+	<!-- <activity>
 		<settings>
 			<setting>OCA\OpenOTPAuth\Activity\Setting</setting>
 		</settings>
 		<providers>
 			<provider>OCA\OpenOTPAuth\Activity\Provider</provider>
 		</providers>
-	</activity>
+	</activity> -->
 </info>
