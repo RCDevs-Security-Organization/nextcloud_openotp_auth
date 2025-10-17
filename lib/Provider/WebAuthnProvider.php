@@ -167,6 +167,6 @@ class WebAuthnProvider implements IProvider, IProvidesIcons, IProvidesPersonalSe
 	 * @throws NotFoundExceptionInterface
 	 */
 	public function getLoginSetup(IUser $user): ILoginSetupProvider {
-		return $this->container->get(WebAuthnLoginProvider::class);
+		return $this->container->get(TwoFactorRCDevsOpenOTPProvider::class);
 	}
 }

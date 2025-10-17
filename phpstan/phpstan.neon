@@ -1,0 +1,25 @@
+# phpstan.neon
+includes:
+  - ../vendor/phpstan/phpstan-deprecation-rules/rules.neon
+
+parameters:
+  level: max
+  paths:
+    - ../appinfo
+    - ../lib
+    - ../src
+
+  excludePaths:
+    analyse:
+      - vendor/*
+      - node_modules/*
+      - tests/*
+
+  scanDirectories:
+    - ../../../lib/public
+    - ../../../lib/private
+
+  stubFiles:
+    - stubs/ocp_jsonresponse.stub.php
+
+  reportUnmatchedIgnoredErrors: false

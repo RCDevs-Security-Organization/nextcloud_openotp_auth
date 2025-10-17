@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c900234f7dd8fecf5cf6381110e7278f",
+    "content-hash": "6a620819742713076961306c6d8119bc",
     "packages": [
         {
             "name": "bamarni/composer-bin-plugin",
@@ -1393,6 +1393,54 @@
             "time": "2025-04-29T12:36:36+00:00"
         },
         {
+            "name": "nextcloud/ocp",
+            "version": "v32.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nextcloud-deps/ocp.git",
+                "reference": "f25b267f759f10e5aad18ed15f14b9881df5652d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/f25b267f759f10e5aad18ed15f14b9881df5652d",
+                "reference": "f25b267f759f10e5aad18ed15f14b9881df5652d",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~8.1 || ~8.2 || ~8.3 || ~8.4",
+                "psr/clock": "^1.0",
+                "psr/container": "^2.0.2",
+                "psr/event-dispatcher": "^1.0",
+                "psr/log": "^3.0.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-stable32": "32.0.0-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "AGPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Christoph Wurst",
+                    "email": "christoph@winzerhof-wurst.at"
+                },
+                {
+                    "name": "Joas Schilling",
+                    "email": "coding@schilljs.com"
+                }
+            ],
+            "description": "Composer package containing Nextcloud's public OCP API and the unstable NCU API",
+            "support": {
+                "issues": "https://github.com/nextcloud-deps/ocp/issues",
+                "source": "https://github.com/nextcloud-deps/ocp/tree/v32.0.0"
+            },
+            "time": "2025-09-16T00:45:44+00:00"
+        },
+        {
             "name": "nikic/php-parser",
             "version": "v5.4.0",
             "source": {
@@ -1633,6 +1681,106 @@
                 "source": "https://github.com/php-webdriver/php-webdriver/tree/1.15.2"
             },
             "time": "2024-11-21T15:12:59+00:00"
+        },
+        {
+            "name": "phpstan/phpstan",
+            "version": "2.1.30",
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/a4a7f159927983dd4f7c8020ed227d80b7f39d7d",
+                "reference": "a4a7f159927983dd4f7c8020ed227d80b7f39d7d",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4|^8.0"
+            },
+            "conflict": {
+                "phpstan/phpstan-shim": "*"
+            },
+            "bin": [
+                "phpstan",
+                "phpstan.phar"
+            ],
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHPStan - PHP Static Analysis Tool",
+            "keywords": [
+                "dev",
+                "static analysis"
+            ],
+            "support": {
+                "docs": "https://phpstan.org/user-guide/getting-started",
+                "forum": "https://github.com/phpstan/phpstan/discussions",
+                "issues": "https://github.com/phpstan/phpstan/issues",
+                "security": "https://github.com/phpstan/phpstan/security/policy",
+                "source": "https://github.com/phpstan/phpstan-src"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/ondrejmirtes",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/phpstan",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-10-02T16:07:52+00:00"
+        },
+        {
+            "name": "phpstan/phpstan-deprecation-rules",
+            "version": "2.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpstan/phpstan-deprecation-rules.git",
+                "reference": "468e02c9176891cc901143da118f09dc9505fc2f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpstan-deprecation-rules/zipball/468e02c9176891cc901143da118f09dc9505fc2f",
+                "reference": "468e02c9176891cc901143da118f09dc9505fc2f",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0",
+                "phpstan/phpstan": "^2.1.15"
+            },
+            "require-dev": {
+                "php-parallel-lint/php-parallel-lint": "^1.2",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpunit/phpunit": "^9.6"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "rules.neon"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PHPStan\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHPStan rules for detecting usage of deprecated classes, methods, properties, constants and traits.",
+            "support": {
+                "issues": "https://github.com/phpstan/phpstan-deprecation-rules/issues",
+                "source": "https://github.com/phpstan/phpstan-deprecation-rules/tree/2.0.3"
+            },
+            "time": "2025-05-14T10:56:57+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -2098,6 +2246,59 @@
                 "source": "https://github.com/psalm/phar/tree/5.26.1"
             },
             "time": "2024-09-09T16:22:43+00:00"
+        },
+        {
+            "name": "psr/container",
+            "version": "2.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/container.git",
+                "reference": "c71ecc56dfe541dbd90c5360474fbc405f8d5963"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/container/zipball/c71ecc56dfe541dbd90c5360474fbc405f8d5963",
+                "reference": "c71ecc56dfe541dbd90c5360474fbc405f8d5963",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Container\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Common Container Interface (PHP FIG PSR-11)",
+            "homepage": "https://github.com/php-fig/container",
+            "keywords": [
+                "PSR-11",
+                "container",
+                "container-interface",
+                "container-interop",
+                "psr"
+            ],
+            "support": {
+                "issues": "https://github.com/php-fig/container/issues",
+                "source": "https://github.com/php-fig/container/tree/2.0.2"
+            },
+            "time": "2021-11-05T16:47:00+00:00"
         },
         {
             "name": "roave/security-advisories",
