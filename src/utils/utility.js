@@ -1,14 +1,13 @@
 import { appName, baseUrl } from './config.js';
 
-import { generateUrl, generateFilePath, generateOcsUrl } from '@nextcloud/router';
+import { generateUrl } from '@nextcloud/router';
 
 const getT = (textToTranslate) => {
 	return t(appName, textToTranslate);
 }
 
-// const checkServerUrl = (serverUrlToCheck, apiUrl, loaderElt, messageStatus, messageCheckServerUrl) => {
 const checkServerUrl = (serverNumber, apiUrl, objReqServerUrl) => {
-	let urlRequest = generateOcsUrl(baseUrl + apiUrl);
+	let urlRequest = generateUrl(baseUrl + apiUrl);
 
 	objReqServerUrl.reqServerUrl.enable = true;
 	objReqServerUrl.reqServerUrl.request = true;

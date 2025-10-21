@@ -200,7 +200,7 @@
 <script>
 import {loadState} from '@nextcloud/initial-state';
 import axios from '@nextcloud/axios';
-import {generateFilePath, generateOcsUrl} from '@nextcloud/router';
+import {generateFilePath, generateUrl} from '@nextcloud/router';
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js';
 import {appName, baseUrl} from '../utils/config.js';
 import {getT, checkServerUrl} from '../utils/utility.js';
@@ -260,7 +260,6 @@ export default {
 	},
 
 	mounted() {
-		this.loadingImg = generateFilePath(appName, '', 'img/') + appName + '.svg';
 		this.requestImg = generateFilePath(appName, '', 'img/') + appName + '_gray.svg';
 		this.successImg = generateFilePath(appName, '', 'img/') + appName + '_green.svg';
 		this.failureImg = generateFilePath(appName, '', 'img/') + appName + '_red.svg';
@@ -356,7 +355,7 @@ export default {
 			this.failure = false;
 
 			axios
-				.post(generateOcsUrl(baseUrl + '/api/v1/settings/save'), {
+				.post(generateUrl(baseUrl + '/api/v1/settings/save'), {
 					// appName
 					rcdevsopenotp_server_url1: this.serverUrl1,
 					rcdevsopenotp_server_url2: this.serverUrl2,

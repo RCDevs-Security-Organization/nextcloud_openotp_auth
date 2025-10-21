@@ -27,24 +27,16 @@ namespace OCA\OpenOTPAuth;
 
 use OCA\OpenOTPAuth\AppInfo\Application as OpenOTPAuthApp;
 use OCP\Files\IAppData;
-use OCP\Files\NotFoundException;
-use OCP\Files\NotPermittedException;
-use OCP\Files\SimpleFS\ISimpleFile;
-use OCP\IConfig;
-use OCP\IUser;
 
 class Config
 {
 	public const APP_ID = OpenOTPAuthApp::APP_ID;
 
-	private IConfig $config;
 	protected IAppData $appData;
 
 	public function __construct(
-		IConfig $config,
 		IAppData $appData
 	) {
-		$this->config = $config;
 		$this->appData = $appData;
 	}
 }

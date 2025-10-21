@@ -28,26 +28,26 @@ $requirements = [
 return [
 	'routes' => [
 		[
-			'name' => 'Page#index',
+			'name' => 'page#index',
 			'url' => '/',
 			'verb' => 'GET',
 		],
-	],
-	'ocs' => [
 		/*
 		SETTINGS
 		*/
 		[
-			'name' => 'Settings#checkServerUrl',
+			'name' => 'settings#checkServerUrl',
 			'url' => '/api/{apiVersion}/settings/check/server',
 			'verb' => 'POST',
 			'requirements' => $requirements,
 		],
 		[
-			'name' => 'Settings#saveSettings',
+			'name' => 'settings#saveSettings',
 			'url' => '/api/{apiVersion}/settings/save',
 			'verb' => 'POST',
 			'requirements' => $requirements,
 		],
+	],
+	'ocs' => [
 	],
 ];

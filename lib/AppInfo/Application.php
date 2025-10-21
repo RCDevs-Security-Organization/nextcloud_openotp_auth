@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace OCA\OpenOTPAuth\AppInfo;
 
+use OC\AppFramework\Utility\QueryNotFoundException;
 use OCA\OpenOTPAuth\Event\DisabledByAdmin;
 use OCA\OpenOTPAuth\Event\StateChanged;
 use OCA\OpenOTPAuth\Listener\StateChangeActivity;
@@ -35,12 +36,22 @@ use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\User\Events\UserDeletedEvent;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 class Application extends App implements IBootstrap {
 	public const APP_ID = 'openotp_auth';
 
+/**
+ * 
+ * @param array<string, mixed> $urlParams Parameters passed by the framework
+ * @return void 
+ * @throws QueryNotFoundException 
+ * @throws ContainerExceptionInterface 
+ * @throws NotFoundExceptionInterface 
+ */
 	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_ID, $urlParams);
 	}

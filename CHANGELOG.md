@@ -7,6 +7,14 @@ X.Y.Z
 - Z: minor or patch
 
 -----------------------------------------
+1.32.0
+- Nextcloud 32 version
+
+1.31.3
+- Replace deprecated functions
+- Code cleaning
+- Fix bug on Icon
+
 1.31.2
 - Compliant with PHP 8.4
 - Workaround : disable activity details
@@ -15,6 +23,9 @@ X.Y.Z
 - Upgrade dependencies
 - Copyright updated
 
+-----------------------------------------
+EOL
+-----------------------------------------
 1.30.6
 - Upgrade dependencies
 - Copyright updated
@@ -43,9 +54,6 @@ X.Y.Z
 1.29.3
 - Update dependencies
 
------------------------------------------
-EOL
------------------------------------------
 1.28.4
 - Update dependencies
 
