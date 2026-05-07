@@ -190,6 +190,7 @@
 <script>
 import {loadState} from '@nextcloud/initial-state';
 import axios from '@nextcloud/axios';
+import {showError, showSuccess} from '@nextcloud/dialogs';
 import {generateFilePath, generateUrl} from '@nextcloud/router';
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js';
 import {appName, baseUrl} from '../utils/config.js';
@@ -403,10 +404,14 @@ export default {
 				.then((response) => {
 					this.success = true;
 					this.saved = true;
+					if (!this.saveAgain) {
+						showSuccess(this.getT('OpenOTP settings saved'));
+					}
 				})
 				.catch((error) => {
 					this.failure = true;
 					this.saved = false;
+					showError(this.getT('OpenOTP settings could not be saved'));
 					// eslint-disable-next-line
 					console.log(error);
 				})
