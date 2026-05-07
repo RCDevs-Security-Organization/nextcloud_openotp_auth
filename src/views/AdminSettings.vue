@@ -184,16 +184,6 @@
 			</opaSettingsPartsContainer>
 		</opaSettingsContainer>
 
-		<opaSaveSettings>
-			<button @click="saveSettings">
-				{{ getT('Save settings') }}
-			</button>
-			<transition name="fade">
-				<p v-if="!saved" class="warning">{{ getT('Do not forget to save your settings!') }}</p>
-				<p v-if="success" class="success">{{ getT('Your settings have been saved succesfully') }}</p>
-				<p v-if="failure" class="failure">{{ getT('There was an error saving settings') }}</p>
-			</transition>
-		</opaSaveSettings>
 	</opaMain>
 </template>
 
@@ -221,11 +211,24 @@ const reqServerUrl = {
 		code: false,
 	},
 };
+const AUTOSAVE_DELAY = 600;
 
 export default {
 	name: 'AdminSettings',
 	components: {
 		NcCheckboxRadioSwitch,
+	},
+	watch: {
+		serverUrl1: 'queueSaveSettings',
+		serverUrl2: 'queueSaveSettings',
+		clientId: 'queueSaveSettings',
+		apiKey: 'queueSaveSettings',
+		proxyHost: 'queueSaveSettings',
+		proxyPort: 'queueSaveSettings',
+		proxyUsername: 'queueSaveSettings',
+		proxyPassword: 'queueSaveSettings',
+		disableOtpLocalUsers: 'queueSaveSettings',
+		authenticationMethod: 'queueSaveSettings',
 	},
 
 	data() {
@@ -256,6 +259,10 @@ export default {
 			success: false,
 			failure: false,
 			saved: false,
+			autosaveReady: false,
+			saveTimeout: null,
+			saveInProgress: false,
+			saveAgain: false,
 		};
 	},
 
@@ -285,32 +292,17 @@ export default {
 		this.placeHolderServerUrl = this.getT('Write OpenOTP url here');
 		this.placeHolderApiKey = this.getT('Get API Key from OpenOTP UI');
 
-		// Add Event Listener on all inputs
-		const inputs = document.querySelectorAll('input');
-		inputs.forEach((input) => {
-			input.addEventListener('change', this.inputNotSaved);
-		});
-
-		// Add Event listener on NcCheckboxRadioSwitch (FYI, focus on main generated span tag to check if radio is checked or not: the radio does not throw an event)
-		const attrObserver = new MutationObserver((mutations) => {
-			mutations.forEach((mu) => {
-				if (mu.type === 'attributes' && mu.attributeName === 'class') {
-					this.inputNotSaved();
-				}
-			});
-		});
-
-		const ELS_test = document.querySelectorAll('.opaChkBox');
-		ELS_test.forEach((el) => attrObserver.observe(el, {attributes: true}));
-
-		document.querySelectorAll('.opaChkBox').forEach((btn) => {
-			btn.addEventListener('click', () => ELS_test.forEach((el) => el.classList.toggle(btn.dataset.class)));
-		});
-
 		this.saved = true;
+		this.autosaveReady = true;
 
 		// Call server check
 		this.testConnection();
+	},
+
+	beforeDestroy() {
+		if (this.saveTimeout !== null) {
+			clearTimeout(this.saveTimeout);
+		}
 	},
 
 	beforeMount() {
@@ -339,8 +331,39 @@ export default {
 			this.reqServerUrl['2'].enable = false;
 		},
 
-		inputNotSaved(event) {
+		queueSaveSettings() {
+			if (!this.autosaveReady) {
+				return;
+			}
+
 			this.saved = false;
+			if (this.saveTimeout !== null) {
+				clearTimeout(this.saveTimeout);
+			}
+
+			this.saveTimeout = setTimeout(() => {
+				this.saveTimeout = null;
+				this.saveSettings();
+			}, AUTOSAVE_DELAY);
+		},
+
+		storeServerUrlBeforeEdit(serverNumber) {
+			this.serverUrlBeforeEdit[serverNumber] = this.getServerUrlValue(serverNumber);
+		},
+
+		checkServerUrlOnBlur(serverNumber) {
+			const currentValue = this.getServerUrlValue(serverNumber);
+
+			if (currentValue === this.serverUrlBeforeEdit[serverNumber]) {
+				return;
+			}
+
+			this.serverUrlBeforeEdit[serverNumber] = currentValue;
+			this.testConnection(serverNumber);
+		},
+
+		getServerUrlValue(serverNumber) {
+			return this[`serverUrl${serverNumber}`] || '';
 		},
 
 		resetValueAndCo(refData) {
@@ -351,8 +374,14 @@ export default {
 		},
 
 		saveSettings() {
+			if (this.saveInProgress) {
+				this.saveAgain = true;
+				return;
+			}
+
 			this.success = false;
 			this.failure = false;
+			this.saveInProgress = true;
 
 			axios
 				.post(generateUrl(baseUrl + '/api/v1/settings/save'), {
@@ -380,6 +409,13 @@ export default {
 					this.saved = false;
 					// eslint-disable-next-line
 					console.log(error);
+				})
+				.finally(() => {
+					this.saveInProgress = false;
+					if (this.saveAgain) {
+						this.saveAgain = false;
+						this.queueSaveSettings();
+					}
 				});
 		},
 
