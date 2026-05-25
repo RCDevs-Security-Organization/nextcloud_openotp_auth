@@ -1,6 +1,6 @@
 {
 	"name": "openotp_auth",
-	"version": "1.32.0",
+	"version": "1.32.1",
 	"description": "WebAuthn second factor provider for Nextcloud",
 	"private": true,
 	"dependencies": {

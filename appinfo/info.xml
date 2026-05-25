@@ -24,7 +24,7 @@ It is enterprise-ready with strong support for:
 * ... and much more.
 	</description>
 
-	<version>1.32.0</version>
+	<version>1.32.1</version>
 	<licence>agpl</licence>
 	<author>RCDevs</author>
 	<namespace>OpenOTPAuth</namespace>
@@ -41,6 +41,12 @@ It is enterprise-ready with strong support for:
 		<php min-version="8.2" max-version="8.4"/>
 		<nextcloud min-version="32" max-version="32"/>
 	</dependencies>
+
+	<repair-steps>
+		<uninstall>
+			<step>OCA\OpenOTPAuth\Migration\DisableTwoFactorOnAppDisable</step>
+		</uninstall>
+	</repair-steps>
 
 	<two-factor-providers>
 		<provider>OCA\OpenOTPAuth\Provider\TwoFactorRCDevsOpenOTPProvider</provider>

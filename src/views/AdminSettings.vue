@@ -36,7 +36,7 @@
 						{{ getT('OpenOTP server URL') + '#1' }}
 					</opaItem>
 					<opaItem class="opaSettingsInput">
-						<input id="openotp_server_url1" ref="serverUrl1" v-model="serverUrl1" type="text" :name="openotp_server_url1" maxlength="300" :placeholder="`${placeHolderServerUrl}`" />
+						<input id="openotp_server_url1" ref="serverUrl1" v-model="serverUrl1" type="text" name="openotp_server_url1" maxlength="300" :placeholder="`${placeHolderServerUrl}`" @focus="storeServerUrlBeforeEdit('1')" @blur="checkServerUrlOnBlur('1')" />
 						<deleteIcon @click="resetValueAndCo('serverUrl1')">x</deleteIcon>
 					</opaItem>
 					<opaItem class="opaSettingsImage" @click="testConnection('1')">
@@ -56,7 +56,7 @@
 						{{ getT('OpenOTP server URL') + '#2' }}
 					</opaItem>
 					<opaItem class="opaSettingsInput">
-						<input id="openotp_server_url2" ref="serverUrl2" v-model="serverUrl2" type="text" :name="openotp_server_url2" maxlength="300" :placeholder="`${placeHolderServerUrl}`" />
+						<input id="openotp_server_url2" ref="serverUrl2" v-model="serverUrl2" type="text" name="openotp_server_url2" maxlength="300" :placeholder="`${placeHolderServerUrl}`" @focus="storeServerUrlBeforeEdit('2')" @blur="checkServerUrlOnBlur('2')" />
 						<deleteIcon @click="resetValueAndCo('serverUrl2')">x</deleteIcon>
 					</opaItem>
 					<opaItem class="opaSettingsImage" @click="testConnection('2')">
@@ -76,7 +76,7 @@
 						{{ getT('OpenOTP client ID') }}
 					</opaItem>
 					<opaItem class="opaSettingsInput">
-						<input id="openotp_client_id" ref="clientId" v-model="clientId" type="text" :name="openotp_client_id" maxlength="300" :placeholder="`${placeHolderServerUrl}`" />
+						<input id="openotp_client_id" ref="clientId" v-model="clientId" type="text" name="openotp_client_id" maxlength="300" :placeholder="`${placeHolderServerUrl}`" />
 						<deleteIcon @click="resetValueAndCo('clientId')">x</deleteIcon>
 					</opaItem>
 				</opaSettingsRow>
@@ -111,7 +111,7 @@
 			<opaSettingsPartsContainer>
 				<opaSettingsRow>
 					<opaItem class="opaSettingsLabel">
-						{{ getT('Proxy ') }}
+						{{ getT('Proxy Port') }}
 					</opaItem>
 					<opaItem class="opaSettingsInput">
 						<input id="proxy_port" ref="proxyPort" v-model="proxyPort" type="number" name="proxy_port" min="1" max="65535" />
@@ -138,7 +138,7 @@
 						{{ getT('Proxy Password') }}
 					</opaItem>
 					<opaItem class="opaSettingsInput">
-						<input id="proxy_password" ref="proxyPassword" v-model="proxyPassword" type="text" name="proxy_password" maxlength="255" />
+						<input id="proxy_password" ref="proxyPassword" v-model="proxyPassword" type="password" name="proxy_password" maxlength="255" />
 						<deleteIcon @click="resetValueAndCo('proxyPassword')">x</deleteIcon>
 					</opaItem>
 				</opaSettingsRow>
@@ -155,18 +155,15 @@
 
 			<opaSettingsPartsContainer class="withDoubleBottomMargin">
 				<opaSettingsCol>
-					<!-- <opaItem class="withSimpleBottomMargin">{{ getT('Disable OpenOTP for local users (use standard authentication)') }}</opaItem> -->
-					<opaItem class="withSimpleBottomMargin">{{ getT('Enable OpenOTP for local users') }}</opaItem>
+					<opaItem class="withSimpleBottomMargin">{{ getT('Disable OpenOTP for local users (use standard authentication)') }}</opaItem>
 					<opaSettingsRow>
-						<NcCheckboxRadioSwitch class="opaChkBox yesNo" :button-variant="true" :checked.sync="disableOtpLocalUsers" value="off" name="disableOtpLocalUsers" type="radio" button-variant-grouped="horizontal">
-							<!-- {{ getT('No') }} -->
+						<NcCheckboxRadioSwitch class="opaChkBox yesNo" :button-variant="true" :checked.sync="disableOtpLocalUsers" value="on" name="disableOtpLocalUsers" type="radio" button-variant-grouped="horizontal">
 							{{ getT('Yes') }}
 							<template #icon>
 								<CancelIcon :size="20" />
 							</template>
 						</NcCheckboxRadioSwitch>
-						<NcCheckboxRadioSwitch class="opaChkBox yesNo" :button-variant="true" :checked.sync="disableOtpLocalUsers" value="on" name="disableOtpLocalUsers" type="radio" button-variant-grouped="horizontal">
-							<!-- {{ getT('Yes') }} -->
+						<NcCheckboxRadioSwitch class="opaChkBox yesNo" :button-variant="true" :checked.sync="disableOtpLocalUsers" value="off" name="disableOtpLocalUsers" type="radio" button-variant-grouped="horizontal">
 							{{ getT('No') }}
 							<template #icon>
 								<CheckIcon :size="20" />
@@ -184,22 +181,13 @@
 			</opaSettingsPartsContainer>
 		</opaSettingsContainer>
 
-		<opaSaveSettings>
-			<button @click="saveSettings">
-				{{ getT('Save settings') }}
-			</button>
-			<transition name="fade">
-				<p v-if="!saved" class="warning">{{ getT('Do not forget to save your settings!') }}</p>
-				<p v-if="success" class="success">{{ getT('Your settings have been saved succesfully') }}</p>
-				<p v-if="failure" class="failure">{{ getT('There was an error saving settings') }}</p>
-			</transition>
-		</opaSaveSettings>
 	</opaMain>
 </template>
 
 <script>
 import {loadState} from '@nextcloud/initial-state';
 import axios from '@nextcloud/axios';
+import {showError, showSuccess} from '@nextcloud/dialogs';
 import {generateFilePath, generateUrl} from '@nextcloud/router';
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js';
 import {appName, baseUrl} from '../utils/config.js';
@@ -221,21 +209,33 @@ const reqServerUrl = {
 		code: false,
 	},
 };
+const AUTOSAVE_DELAY = 600;
 
 export default {
 	name: 'AdminSettings',
 	components: {
 		NcCheckboxRadioSwitch,
 	},
+	watch: {
+		serverUrl1: 'queueSaveSettings',
+		serverUrl2: 'queueSaveSettings',
+		clientId: 'queueSaveSettings',
+		apiKey: 'queueSaveSettings',
+		proxyHost: 'queueSaveSettings',
+		proxyPort: 'queueSaveSettings',
+		proxyUsername: 'queueSaveSettings',
+		proxyPassword: 'queueSaveSettings',
+		disableOtpLocalUsers: 'queueSaveSettings',
+		authenticationMethod: 'queueSaveSettings',
+	},
 
 	data() {
-		const serverUrl1 = this.$parent.serverUrl1;
-
 		return {
 			getT: getT,
 			checkServerUrl: checkServerUrl,
 			reqOpenOTP: [],
 			reqServerUrl,
+			serverUrlBeforeEdit: {},
 			// From DB table Settings `oc_appconfig`
 			// Server intel
 			installedVersion: this.$parent.installedVersion,
@@ -256,6 +256,10 @@ export default {
 			success: false,
 			failure: false,
 			saved: false,
+			autosaveReady: false,
+			saveTimeout: null,
+			saveInProgress: false,
+			saveAgain: false,
 		};
 	},
 
@@ -285,32 +289,17 @@ export default {
 		this.placeHolderServerUrl = this.getT('Write OpenOTP url here');
 		this.placeHolderApiKey = this.getT('Get API Key from OpenOTP UI');
 
-		// Add Event Listener on all inputs
-		const inputs = document.querySelectorAll('input');
-		inputs.forEach((input) => {
-			input.addEventListener('change', this.inputNotSaved);
-		});
-
-		// Add Event listener on NcCheckboxRadioSwitch (FYI, focus on main generated span tag to check if radio is checked or not: the radio does not throw an event)
-		const attrObserver = new MutationObserver((mutations) => {
-			mutations.forEach((mu) => {
-				if (mu.type === 'attributes' && mu.attributeName === 'class') {
-					this.inputNotSaved();
-				}
-			});
-		});
-
-		const ELS_test = document.querySelectorAll('.opaChkBox');
-		ELS_test.forEach((el) => attrObserver.observe(el, {attributes: true}));
-
-		document.querySelectorAll('.opaChkBox').forEach((btn) => {
-			btn.addEventListener('click', () => ELS_test.forEach((el) => el.classList.toggle(btn.dataset.class)));
-		});
-
 		this.saved = true;
+		this.autosaveReady = true;
 
 		// Call server check
 		this.testConnection();
+	},
+
+	beforeDestroy() {
+		if (this.saveTimeout !== null) {
+			clearTimeout(this.saveTimeout);
+		}
 	},
 
 	beforeMount() {
@@ -339,8 +328,39 @@ export default {
 			this.reqServerUrl['2'].enable = false;
 		},
 
-		inputNotSaved(event) {
+		queueSaveSettings() {
+			if (!this.autosaveReady) {
+				return;
+			}
+
 			this.saved = false;
+			if (this.saveTimeout !== null) {
+				clearTimeout(this.saveTimeout);
+			}
+
+			this.saveTimeout = setTimeout(() => {
+				this.saveTimeout = null;
+				this.saveSettings();
+			}, AUTOSAVE_DELAY);
+		},
+
+		storeServerUrlBeforeEdit(serverNumber) {
+			this.serverUrlBeforeEdit[serverNumber] = this.getServerUrlValue(serverNumber);
+		},
+
+		checkServerUrlOnBlur(serverNumber) {
+			const currentValue = this.getServerUrlValue(serverNumber);
+
+			if (currentValue === this.serverUrlBeforeEdit[serverNumber]) {
+				return;
+			}
+
+			this.serverUrlBeforeEdit[serverNumber] = currentValue;
+			this.testConnection(serverNumber);
+		},
+
+		getServerUrlValue(serverNumber) {
+			return this[`serverUrl${serverNumber}`] || '';
 		},
 
 		resetValueAndCo(refData) {
@@ -351,8 +371,14 @@ export default {
 		},
 
 		saveSettings() {
+			if (this.saveInProgress) {
+				this.saveAgain = true;
+				return;
+			}
+
 			this.success = false;
 			this.failure = false;
+			this.saveInProgress = true;
 
 			axios
 				.post(generateUrl(baseUrl + '/api/v1/settings/save'), {
@@ -374,23 +400,37 @@ export default {
 				.then((response) => {
 					this.success = true;
 					this.saved = true;
+					if (!this.saveAgain) {
+						showSuccess(this.getT('OpenOTP settings saved'));
+					}
 				})
 				.catch((error) => {
 					this.failure = true;
 					this.saved = false;
+					showError(this.getT('OpenOTP settings could not be saved'));
 					// eslint-disable-next-line
 					console.log(error);
+				})
+				.finally(() => {
+					this.saveInProgress = false;
+					if (this.saveAgain) {
+						this.saveAgain = false;
+						this.queueSaveSettings();
+					}
 				});
 		},
 
 		testConnection(serverNumber) {
-			let apiUrl = '/api/v1/settings/check/server';
+			const apiUrl = '/api/v1/settings/check/server';
 
 			if (serverNumber) {
-				this.checkServerUrl(serverNumber, apiUrl, {reqServerUrl: this.reqServerUrl[serverNumber]});
+				this.checkServerUrl(serverNumber, apiUrl, {
+					reqServerUrl: this.reqServerUrl[serverNumber],
+					serverUrl: this.getServerUrlValue(serverNumber),
+				});
 			} else {
-				this.checkServerUrl('1', apiUrl, {reqServerUrl: this.reqServerUrl['1']});
-				this.checkServerUrl('2', apiUrl, {reqServerUrl: this.reqServerUrl['2']});
+				this.checkServerUrl('1', apiUrl, {reqServerUrl: this.reqServerUrl['1'], serverUrl: this.serverUrl1});
+				this.checkServerUrl('2', apiUrl, {reqServerUrl: this.reqServerUrl['2'], serverUrl: this.serverUrl2});
 			}
 		},
 
