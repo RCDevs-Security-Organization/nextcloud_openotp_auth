@@ -3,8 +3,12 @@ import { appName, baseUrl } from './config.js';
 import { generateUrl } from '@nextcloud/router';
 
 const getT = (textToTranslate) => {
-	return t(appName, textToTranslate);
-}
+	const translated = t(appName, textToTranslate);
+	if (typeof translated === 'string' && translated.trim() !== '') {
+		return translated;
+	}
+	return textToTranslate;
+};
 
 const checkServerUrl = (serverNumber, apiUrl, objReqServerUrl) => {
 	let urlRequest = generateUrl(baseUrl + apiUrl);
@@ -12,14 +16,19 @@ const checkServerUrl = (serverNumber, apiUrl, objReqServerUrl) => {
 	objReqServerUrl.reqServerUrl.enable = true;
 	objReqServerUrl.reqServerUrl.request = true;
 
-	$.post(urlRequest, { serverNumber: serverNumber }, function (response) {
+	const requestData = { serverNumber: serverNumber };
+	if (Object.prototype.hasOwnProperty.call(objReqServerUrl, 'serverUrl')) {
+		requestData.serverUrl = objReqServerUrl.serverUrl || '';
+	}
+
+	$.post(urlRequest, requestData, function (response) {
 		objReqServerUrl.reqServerUrl.enable = true;
 		objReqServerUrl.reqServerUrl.request = false;
 		objReqServerUrl.reqServerUrl.code = response.code;
 		objReqServerUrl.reqServerUrl.message = response.message;
 		objReqServerUrl.reqServerUrl.status = response.status;
 	});
-}
+};
 
 export { getT, checkServerUrl };
 // export { getT };

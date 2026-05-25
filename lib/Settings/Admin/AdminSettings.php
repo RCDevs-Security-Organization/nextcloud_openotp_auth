@@ -72,16 +72,22 @@ class AdminSettings implements ISettings
 			];
 	
 			$this->initialState->provideInitialState('initialSettings', $initialSettings);
-	
-			Util::addScript(Config::APP_ID, Config::APP_ID . '-admin-settings');
-	
-			return new TemplateResponse(Config::APP_ID, 'settings/admin-settings', [], '');
+
+			$adminBundle = dirname(__DIR__, 3) . '/js/' . Config::APP_ID . '-admin-settings.js';
+			if (is_file($adminBundle)) {
+				Util::addScript(Config::APP_ID, Config::APP_ID . '-admin-settings');
+			}
+
+			return new TemplateResponse(Config::APP_ID, 'settings/admin-settings', [
+				'initialSettings' => $initialSettings,
+				'hasAdminBundle' => is_file($adminBundle),
+			], '');
 		}
 	
 		/**
 		 * @return string the section ID, e.g. 'sharing'
 		 */
-		public function getSection()
+		public function getSection(): string
 		{
 			return OpenOTPAuthApp::APP_ID;
 		}
@@ -93,7 +99,7 @@ class AdminSettings implements ISettings
 		 *
 		 * E.g.: 70
 		 */
-		public function getPriority()
+		public function getPriority(): int
 		{
 			return 55;
 		}

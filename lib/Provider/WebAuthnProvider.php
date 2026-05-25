@@ -140,11 +140,11 @@ class WebAuthnProvider implements IProvider, IProvidesIcons, IProvidesPersonalSe
 		return new Personal();
 	}
 
-	public function getLightIcon(): String {
+	public function getLightIcon(): string {
 		return $this->urlGenerator->imagePath(OpenOTPAuthApp::APP_ID, 'app.svg');
 	}
 
-	public function getDarkIcon(): String {
+	public function getDarkIcon(): string {
 		return $this->urlGenerator->imagePath(OpenOTPAuthApp::APP_ID, 'app-dark.svg');
 	}
 

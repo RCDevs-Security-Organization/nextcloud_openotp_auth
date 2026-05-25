@@ -23,33 +23,34 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\OpenOTPAuth\Settings\Admin;
+namespace OCA\OpenOTPAuth\Migration;
 
-use OCA\OpenOTPAuth\AppInfo\Application as OpenOTPAuthApp;
-use OCP\IL10N;
-use OCP\IURLGenerator;
-use OCP\Settings\IIconSection;
+use OCA\OpenOTPAuth\AppInfo\Application;
+use OCP\Authentication\TwoFactorAuth\IRegistry;
+use OCP\IConfig;
+use OCP\Migration\IOutput;
+use OCP\Migration\IRepairStep;
 
-class AdminSection implements IIconSection {
+class DisableTwoFactorOnAppDisable implements IRepairStep {
 	public function __construct(
-		private readonly IURLGenerator $url,
-		private readonly IL10N $l10n,
+		private IRegistry $registry,
+		private IConfig $config,
 	) {
 	}
 
-	public function getIcon(): string {
-		return $this->url->imagePath(OpenOTPAuthApp::APP_ID, 'app-dark.svg');
-	}
-
-	public function getID(): string {
-		return OpenOTPAuthApp::APP_ID;
-	}
-
 	public function getName(): string {
-		return $this->l10n->t('OpenOTP Authentication');
+		return 'Disable OpenOTP two-factor authentication';
 	}
 
-	public function getPriority(): int {
-		return 55;
+	public function run(IOutput $output): void {
+		$this->registry->cleanUp(Application::APP_ID);
+		$output->info('Removed OpenOTP two-factor provider associations.');
+
+		if ($this->config->getSystemValue('twofactor_enforced', 'false') === 'true') {
+			$this->config->setSystemValue('twofactor_enforced', 'false');
+			$this->config->setSystemValue('twofactor_enforced_groups', []);
+			$this->config->setSystemValue('twofactor_enforced_excluded_groups', []);
+			$output->info('Disabled enforced two-factor authentication.');
+		}
 	}
 }

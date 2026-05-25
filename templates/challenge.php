@@ -121,6 +121,33 @@ if (is_array($_['challenge_params'])) extract($_['challenge_params']);
 					});
 			};
 
+			var openotpTranslations = <?php echo json_encode([
+				'A problem occurs, please verify your configuration:' => (string)$l->t('A problem occurs, please verify your configuration:'),
+				'FIDO client communication with the public AppID URL requires SSL. Verify your AppID and communication in between.' => (string)$l->t('FIDO client communication with the public AppID URL requires SSL. Verify your AppID and communication in between.'),
+				'Onwcloud App URL (U2F facets) MUST be under the same DNS domain suffix as the AppID URL (configured in RCDevs MFA Server - WebADM WebPortal)' => (string)$l->t('Onwcloud App URL (U2F facets) MUST be under the same DNS domain suffix as the AppID URL (configured in RCDevs MFA Server - WebADM WebPortal)'),
+				'Fido U2F login Method is only available for Chrome, Firefox and Opera. Internet Explorer and other Web browser are coming soon.' => (string)$l->t('Fido U2F login Method is only available for Chrome, Firefox and Opera. Internet Explorer and other Web browser are coming soon.'),
+				'Read more on RCDevs Docs site' => (string)$l->t('Read more on RCDevs Docs site'),
+				'Invalid U2F request' => (string)$l->t('Invalid U2F request'),
+				'Unsupported U2F client' => (string)$l->t('Unsupported U2F client'),
+				'Unsupported U2F device' => (string)$l->t('Unsupported U2F device'),
+				'U2F request timed out' => (string)$l->t('U2F request timed out'),
+				'Unknown U2F error' => (string)$l->t('Unknown U2F error'),
+				'Browser Not Supported' => (string)$l->t('Browser Not Supported'),
+				'second' => (string)$l->t('second'),
+				'seconds' => (string)$l->t('seconds'),
+				'Login timedout!' => (string)$l->t('Login timedout!'),
+				'Retry' => (string)$l->t('Retry'),
+			], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+			function t(app, text) {
+				if (typeof window.t === 'function') {
+					return window.t.apply(window, arguments);
+				}
+				if (app === 'openotp_auth' && Object.prototype.hasOwnProperty.call(openotpTranslations, text)) {
+					return openotpTranslations[text];
+				}
+				return text;
+			}
+
 			setInterval(function() {
 				$(".blink").animate({
 					opacity: 0.1
@@ -135,16 +162,8 @@ if (is_array($_['challenge_params'])) extract($_['challenge_params']);
 				$("#OpenOTPLoginForm").submit();
 			<?php } ?>
 
-			if ($("#openotp_retry").length) {
-				$(this).on('click', function() {
-					window.location = "";
-				});
-			}
-
-			$(document).arrive("#openotp_retry", function() {
-				$("#openotp_retry").on("click", function() {
-					window.location = "";
-				});
+			$(document).on("click", "#openotp_retry", function() {
+				window.location = "";
 			});
 
 			$('#u2f_button').click(function() {

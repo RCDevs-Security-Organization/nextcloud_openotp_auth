@@ -36,16 +36,19 @@ use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\User\Events\UserDeletedEvent;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-
 class Application extends App implements IBootstrap {
 	public const APP_ID = 'openotp_auth';
 
-	public function __construct(array $urlParams = []) {
-		parent::__construct(self::APP_ID, $urlParams);
+	public function __construct() {
+		parent::__construct(self::APP_ID);
 	}
 
 	public function register(IRegistrationContext $context): void {
+		$vendorAutoload = __DIR__ . '/../../vendor/autoload.php';
+		if (is_file($vendorAutoload)) {
+			include_once $vendorAutoload;
+		}
+
 		$context->registerEventListener(StateChanged::class, StateChangeActivity::class);
 		$context->registerEventListener(StateChanged::class, StateChangeRegistryUpdater::class);
 		$context->registerEventListener(DisabledByAdmin::class, StateChangeActivity::class);

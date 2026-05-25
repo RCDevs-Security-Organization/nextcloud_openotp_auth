@@ -36,7 +36,7 @@
 						{{ getT('OpenOTP server URL') + '#1' }}
 					</opaItem>
 					<opaItem class="opaSettingsInput">
-						<input id="openotp_server_url1" ref="serverUrl1" v-model="serverUrl1" type="text" :name="openotp_server_url1" maxlength="300" :placeholder="`${placeHolderServerUrl}`" />
+						<input id="openotp_server_url1" ref="serverUrl1" v-model="serverUrl1" type="text" name="openotp_server_url1" maxlength="300" :placeholder="`${placeHolderServerUrl}`" @focus="storeServerUrlBeforeEdit('1')" @blur="checkServerUrlOnBlur('1')" />
 						<deleteIcon @click="resetValueAndCo('serverUrl1')">x</deleteIcon>
 					</opaItem>
 					<opaItem class="opaSettingsImage" @click="testConnection('1')">
@@ -56,7 +56,7 @@
 						{{ getT('OpenOTP server URL') + '#2' }}
 					</opaItem>
 					<opaItem class="opaSettingsInput">
-						<input id="openotp_server_url2" ref="serverUrl2" v-model="serverUrl2" type="text" :name="openotp_server_url2" maxlength="300" :placeholder="`${placeHolderServerUrl}`" />
+						<input id="openotp_server_url2" ref="serverUrl2" v-model="serverUrl2" type="text" name="openotp_server_url2" maxlength="300" :placeholder="`${placeHolderServerUrl}`" @focus="storeServerUrlBeforeEdit('2')" @blur="checkServerUrlOnBlur('2')" />
 						<deleteIcon @click="resetValueAndCo('serverUrl2')">x</deleteIcon>
 					</opaItem>
 					<opaItem class="opaSettingsImage" @click="testConnection('2')">
@@ -76,7 +76,7 @@
 						{{ getT('OpenOTP client ID') }}
 					</opaItem>
 					<opaItem class="opaSettingsInput">
-						<input id="openotp_client_id" ref="clientId" v-model="clientId" type="text" :name="openotp_client_id" maxlength="300" :placeholder="`${placeHolderServerUrl}`" />
+						<input id="openotp_client_id" ref="clientId" v-model="clientId" type="text" name="openotp_client_id" maxlength="300" :placeholder="`${placeHolderServerUrl}`" />
 						<deleteIcon @click="resetValueAndCo('clientId')">x</deleteIcon>
 					</opaItem>
 				</opaSettingsRow>
@@ -111,7 +111,7 @@
 			<opaSettingsPartsContainer>
 				<opaSettingsRow>
 					<opaItem class="opaSettingsLabel">
-						{{ getT('Proxy ') }}
+						{{ getT('Proxy Port') }}
 					</opaItem>
 					<opaItem class="opaSettingsInput">
 						<input id="proxy_port" ref="proxyPort" v-model="proxyPort" type="number" name="proxy_port" min="1" max="65535" />
@@ -138,7 +138,7 @@
 						{{ getT('Proxy Password') }}
 					</opaItem>
 					<opaItem class="opaSettingsInput">
-						<input id="proxy_password" ref="proxyPassword" v-model="proxyPassword" type="text" name="proxy_password" maxlength="255" />
+						<input id="proxy_password" ref="proxyPassword" v-model="proxyPassword" type="password" name="proxy_password" maxlength="255" />
 						<deleteIcon @click="resetValueAndCo('proxyPassword')">x</deleteIcon>
 					</opaItem>
 				</opaSettingsRow>
@@ -155,18 +155,15 @@
 
 			<opaSettingsPartsContainer class="withDoubleBottomMargin">
 				<opaSettingsCol>
-					<!-- <opaItem class="withSimpleBottomMargin">{{ getT('Disable OpenOTP for local users (use standard authentication)') }}</opaItem> -->
-					<opaItem class="withSimpleBottomMargin">{{ getT('Enable OpenOTP for local users') }}</opaItem>
+					<opaItem class="withSimpleBottomMargin">{{ getT('Disable OpenOTP for local users (use standard authentication)') }}</opaItem>
 					<opaSettingsRow>
-						<NcCheckboxRadioSwitch class="opaChkBox yesNo" :button-variant="true" :checked.sync="disableOtpLocalUsers" value="off" name="disableOtpLocalUsers" type="radio" button-variant-grouped="horizontal">
-							<!-- {{ getT('No') }} -->
+						<NcCheckboxRadioSwitch class="opaChkBox yesNo" :button-variant="true" :checked.sync="disableOtpLocalUsers" value="on" name="disableOtpLocalUsers" type="radio" button-variant-grouped="horizontal">
 							{{ getT('Yes') }}
 							<template #icon>
 								<CancelIcon :size="20" />
 							</template>
 						</NcCheckboxRadioSwitch>
-						<NcCheckboxRadioSwitch class="opaChkBox yesNo" :button-variant="true" :checked.sync="disableOtpLocalUsers" value="on" name="disableOtpLocalUsers" type="radio" button-variant-grouped="horizontal">
-							<!-- {{ getT('Yes') }} -->
+						<NcCheckboxRadioSwitch class="opaChkBox yesNo" :button-variant="true" :checked.sync="disableOtpLocalUsers" value="off" name="disableOtpLocalUsers" type="radio" button-variant-grouped="horizontal">
 							{{ getT('No') }}
 							<template #icon>
 								<CheckIcon :size="20" />
@@ -233,13 +230,12 @@ export default {
 	},
 
 	data() {
-		const serverUrl1 = this.$parent.serverUrl1;
-
 		return {
 			getT: getT,
 			checkServerUrl: checkServerUrl,
 			reqOpenOTP: [],
 			reqServerUrl,
+			serverUrlBeforeEdit: {},
 			// From DB table Settings `oc_appconfig`
 			// Server intel
 			installedVersion: this.$parent.installedVersion,
@@ -425,13 +421,16 @@ export default {
 		},
 
 		testConnection(serverNumber) {
-			let apiUrl = '/api/v1/settings/check/server';
+			const apiUrl = '/api/v1/settings/check/server';
 
 			if (serverNumber) {
-				this.checkServerUrl(serverNumber, apiUrl, {reqServerUrl: this.reqServerUrl[serverNumber]});
+				this.checkServerUrl(serverNumber, apiUrl, {
+					reqServerUrl: this.reqServerUrl[serverNumber],
+					serverUrl: this.getServerUrlValue(serverNumber),
+				});
 			} else {
-				this.checkServerUrl('1', apiUrl, {reqServerUrl: this.reqServerUrl['1']});
-				this.checkServerUrl('2', apiUrl, {reqServerUrl: this.reqServerUrl['2']});
+				this.checkServerUrl('1', apiUrl, {reqServerUrl: this.reqServerUrl['1'], serverUrl: this.serverUrl1});
+				this.checkServerUrl('2', apiUrl, {reqServerUrl: this.reqServerUrl['2'], serverUrl: this.serverUrl2});
 			}
 		},
 

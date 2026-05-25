@@ -7,10 +7,19 @@ X.Y.Z
 - Z: minor or patch
 
 -----------------------------------------
+1.33.0
+- Nextcloud 33 version
+- Standard saving process in Settings
+- Disable OTP step when App is disabled
+
+1.32.1
+- Standard saving process in Settings
+- Disable OTP step when App is disabled
+
 1.32.0
 - Nextcloud 32 version
 
-1.31.3-alpha.1
+1.31.3
 - Replace deprecated functions
 - Code cleaning
 - Fix bug on Icon
