@@ -7,6 +7,14 @@ X.Y.Z
 - Z: minor or patch
 
 -----------------------------------------
+1.34.0
+- Nextcloud 34 version
+
+1.33.1
+- issues on PHP types due to new PHP versions
+- deprecated Nextcloud functions replaced
+- Code cleaning
+
 1.33.0
 - Nextcloud 33 version
 - Standard saving process in Settings

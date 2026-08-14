@@ -2,7 +2,7 @@
 
 /**
  *
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -26,25 +26,28 @@ declare(strict_types=1);
 namespace OCA\OpenOTPAuth;
 
 use OCA\OpenOTPAuth\AppInfo\Application as OpenOTPAuthApp;
-use OCP\Files\IAppData;
-use OCP\Files\NotFoundException;
-use OCP\Files\NotPermittedException;
-use OCP\Files\SimpleFS\ISimpleFile;
-use OCP\IConfig;
-use OCP\IUser;
 
 class Config
 {
 	public const APP_ID = OpenOTPAuthApp::APP_ID;
 
-	private IConfig $config;
-	protected IAppData $appData;
-
-	public function __construct(
-		IConfig $config,
-		IAppData $appData
-	) {
-		$this->config = $config;
-		$this->appData = $appData;
+	/** @return array<string, list<string>> */
+	public static function getAuthorizedAppConfig(): array
+	{
+		return [
+			self::APP_ID => [
+				'/^rcdevsopenotp_allow_user_administer_openotp$/',
+				'/^rcdevsopenotp_api_key$/',
+				'/^rcdevsopenotp_authentication_method$/',
+				'/^rcdevsopenotp_client_id$/',
+				'/^rcdevsopenotp_disable_otp_local_users$/',
+				'/^rcdevsopenotp_proxy_host$/',
+				'/^rcdevsopenotp_proxy_password$/',
+				'/^rcdevsopenotp_proxy_port$/',
+				'/^rcdevsopenotp_proxy_username$/',
+				'/^rcdevsopenotp_server_url1$/',
+				'/^rcdevsopenotp_server_url2$/',
+			],
+		];
 	}
 }

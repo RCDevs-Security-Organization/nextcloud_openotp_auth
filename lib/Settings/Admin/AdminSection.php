@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,9 +21,11 @@ declare(strict_types=1);
  *
  */
 
+declare(strict_types=1);
+
 namespace OCA\OpenOTPAuth\Settings\Admin;
 
-use OCA\OpenOTPAuth\AppInfo\Application as OpenOTPAuthApp;
+use OCA\OpenOTPAuth\Config;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\Settings\IIconSection;
@@ -38,11 +38,11 @@ class AdminSection implements IIconSection {
 	}
 
 	public function getIcon(): string {
-		return $this->url->imagePath(OpenOTPAuthApp::APP_ID, 'app-dark.svg');
+		return $this->url->imagePath(Config::APP_ID, 'app-dark.svg');
 	}
 
 	public function getID(): string {
-		return OpenOTPAuthApp::APP_ID;
+		return Config::APP_ID;
 	}
 
 	public function getName(): string {

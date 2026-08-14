@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,35 +21,35 @@ declare(strict_types=1);
  *
  */
 
+declare(strict_types=1);
+
 namespace OCA\OpenOTPAuth\Controller;
 
-use OCA\OpenOTPAuth\AppInfo\Application as OpenOTPAuthApp;
 use OCA\OpenOTPAuth\AuthService\OpenotpAuth;
+use OCA\OpenOTPAuth\Config;
 use OCA\OpenOTPAuth\Event\StateChanged;
+use OCA\OpenOTPAuth\Helper\RequestParamHelper;
+use OCA\OpenOTPAuth\Settings\Admin\AdminSettings;
 use OCP\App\IAppManager;
+use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\AuthorizedAdminSetting;
 use OCP\AppFramework\Http\JSONResponse;
-use OCP\Authentication\TwoFactorAuth\ALoginSetupController;
 use OCP\EventDispatcher\IEventDispatcher;
 // use OCP\Defaults;
-use OCP\IConfig;
+use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\IRequest;
+use OCP\IUserBackend;
 use OCP\IUserManager;
 use Psr\Log\LoggerInterface;
 
-class SettingsController extends ALoginSetupController
+class SettingsController extends Controller
 {
-
-	// /** @var WebAuthnManager */
-	// private $manager;
-
-	// /** @var IUserSession */
-	// private $userSession;
-
 	public function __construct(
 		private IEventDispatcher $eventDispatcher,
 		private IAppManager $appManager,
-		private IConfig $config,
+		private IAppConfig $appConfig,
 		private IL10N $l10n,
 		private LoggerInterface $logger,
 		protected IUserManager $userManager,
@@ -61,73 +59,30 @@ class SettingsController extends ALoginSetupController
 		parent::__construct($appName, $request);
 	}
 
-	// /**
-	//  * @NoAdminRequired
-	//  * @PasswordConfirmationRequired
-	//  * @UseSession
-	//  */
-	// public function startRegister(): JSONResponse
-	// {
-	// 	return new JSONResponse($this->manager->startRegistration($this->userSession->getUser(), $this->request->getServerHost()));
-	// }
 
-	// /**
-	//  * @NoAdminRequired
-	//  * @PasswordConfirmationRequired
-	//  *
-	//  * @param string $name
-	//  * @param string $data
-	//  */
-	// public function finishRegister(string $name, string $data): JSONResponse
-	// {
-	// 	return new JSONResponse(
-	// 		$this->manager->finishRegister(
-	// 			$this->userSession->getUser(),
-	// 			$name,
-	// 			$data
-	// 		)
-	// 	);
-	// }
+		/**
+		 * Nextcloud 32 version.
+		 * Standard saving process in Settings.
+		 *
+		 * @return JSONResponse<Http::STATUS_OK, array{code: string, status: string, message: string}, array<string, string>>
+		 */
+		#[AuthorizedAdminSetting(settings: AdminSettings::class)]
+		public function saveSettings(): JSONResponse {
+		$authenticationMethod = RequestParamHelper::requestStringParam($this->request, 'rcdevsopenotp_authentication_method');
 
-	// /**
-	//  * @NoAdminRequired
-	//  * @PasswordConfirmationRequired
-	//  */
-	// public function remove(int $id): JSONResponse
-	// {
-	// 	$this->manager->removeDevice($this->userSession->getUser(), $id);
-	// 	return new JSONResponse([]);
-	// }
+		$this->appConfig->setValueString(Config::APP_ID, 'rcdevsopenotp_allow_user_administer_openotp',	'off');
+		$this->appConfig->setValueString(Config::APP_ID, 'rcdevsopenotp_api_key',							RequestParamHelper::requestStringParam($this->request, 'rcdevsopenotp_api_key'));
+		$this->appConfig->setValueString(Config::APP_ID, 'rcdevsopenotp_authentication_method',				$authenticationMethod);
+		$this->appConfig->setValueString(Config::APP_ID, 'rcdevsopenotp_client_id',							RequestParamHelper::requestStringParam($this->request, 'rcdevsopenotp_client_id'));
+		$this->appConfig->setValueString(Config::APP_ID, 'rcdevsopenotp_disable_otp_local_users',			RequestParamHelper::requestStringParam($this->request, 'rcdevsopenotp_disable_otp_local_users'));
+		$this->appConfig->setValueString(Config::APP_ID, 'rcdevsopenotp_proxy_host',						RequestParamHelper::requestStringParam($this->request, 'rcdevsopenotp_proxy_host'));
+		$this->appConfig->setValueString(Config::APP_ID, 'rcdevsopenotp_proxy_password',					RequestParamHelper::requestStringParam($this->request, 'rcdevsopenotp_proxy_password'));
+		$this->appConfig->setValueString(Config::APP_ID, 'rcdevsopenotp_proxy_port',						RequestParamHelper::requestStringParam($this->request, 'rcdevsopenotp_proxy_port'));
+		$this->appConfig->setValueString(Config::APP_ID, 'rcdevsopenotp_proxy_username',					RequestParamHelper::requestStringParam($this->request, 'rcdevsopenotp_proxy_username'));
+		$this->appConfig->setValueString(Config::APP_ID, 'rcdevsopenotp_server_url1',						RequestParamHelper::requestStringParam($this->request, 'rcdevsopenotp_server_url1'));
+		$this->appConfig->setValueString(Config::APP_ID, 'rcdevsopenotp_server_url2',						RequestParamHelper::requestStringParam($this->request, 'rcdevsopenotp_server_url2'));
 
-	// /**
-	//  * @NoAdminRequired
-	//  * @PasswordConfirmationRequired
-	//  */
-	// public function changeActivationState(int $id, bool $active): JSONResponse
-	// {
-	// 	$this->manager->changeActivationState($this->userSession->getUser(), $id, $active);
-	// 	return new JSONResponse([]);
-	// }
-
-	/**
-	 * @AdminRequired
-	 * Nextcloud 32 version.
-	 * Standard saving process in Settings.
-	 */
-	public function saveSettings(): JSONResponse {
-		$this->config->setAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_allow_user_administer_openotp',	'off');
-		$this->config->setAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_api_key',							(string)$this->request->getParam('rcdevsopenotp_api_key', ''));
-		$this->config->setAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_authentication_method',			(string)$this->request->getParam('rcdevsopenotp_authentication_method', ''));
-		$this->config->setAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_client_id',						(string)$this->request->getParam('rcdevsopenotp_client_id', ''));
-		$this->config->setAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_disable_otp_local_users',			(string)$this->request->getParam('rcdevsopenotp_disable_otp_local_users', ''));
-		$this->config->setAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_proxy_host',						(string)$this->request->getParam('rcdevsopenotp_proxy_host', ''));
-		$this->config->setAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_proxy_password',					(string)$this->request->getParam('rcdevsopenotp_proxy_password', ''));
-		$this->config->setAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_proxy_port',						(string)$this->request->getParam('rcdevsopenotp_proxy_port', ''));
-		$this->config->setAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_proxy_username',					(string)$this->request->getParam('rcdevsopenotp_proxy_username', ''));
-		$this->config->setAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_server_url1',						(string)$this->request->getParam('rcdevsopenotp_server_url1', ''));
-		$this->config->setAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_server_url2',						(string)$this->request->getParam('rcdevsopenotp_server_url2', ''));
-
-		switch ($this->request->getParam('rcdevsopenotp_authentication_method')) {
+		switch ($authenticationMethod) {
 			case '0':
 				$stateChanged = false;
 				break;
@@ -147,7 +102,7 @@ class SettingsController extends ALoginSetupController
 
 		/* @var $backend \OCP\UserInterface */
 		foreach ($this->userManager->getBackends() as $backend) {
-			if ($backend->getBackendName() === 'Database' && $this->request->getParam('rcdevsopenotp_disable_otp_local_users') === 'on') {
+			if ($backend instanceof IUserBackend && $backend->getBackendName() === 'Database' && $this->request->getParam('rcdevsopenotp_disable_otp_local_users') === 'on') {
 				$limit = 500;
 				$offset = 0;
 				do {
@@ -190,49 +145,78 @@ class SettingsController extends ALoginSetupController
 	}
 
 	/**
-	 * @AdminRequired
+	 * @return JSONResponse<Http::STATUS_OK, array{status: bool, content: string}, array{}>|JSONResponse<Http::STATUS_NOT_FOUND, array{status: bool, message: string}, array{}>
 	 */
+	#[AuthorizedAdminSetting(settings: AdminSettings::class)]
+	public function getChangelog(): JSONResponse {
+		try {
+			$appPath = $this->appManager->getAppPath(Config::APP_ID);
+			$changelogPath = $appPath . '/CHANGELOG.md';
+			$content = file_get_contents($changelogPath);
+		} catch (\Throwable $th) {
+			$this->logger->warning($th->getMessage(), ['app' => Config::APP_ID]);
+			$content = false;
+		}
+
+		if ($content === false) {
+			return new JSONResponse([
+				'status' => false,
+				'message' => $this->l10n->t('Could not read changelog'),
+			], Http::STATUS_NOT_FOUND);
+		}
+
+		return new JSONResponse([
+			'status' => true,
+			'content' => $content,
+		]);
+	}
+
+	/**
+	 * @return JSONResponse<Http::STATUS_OK, array{code: int, status: bool, message: string}, array{}>
+	 */
+	#[AuthorizedAdminSetting(settings: AdminSettings::class)]
 	public function checkServerUrl(string $serverNumber): JSONResponse {
-		$params['rcdevsopenotp_api_key'] = $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_api_key');
-		$params['rcdevsopenotp_authentication_method'] = $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_authentication_method');
-		$params['rcdevsopenotp_client_id'] = $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_client_id');
-		$params['rcdevsopenotp_disable_otp_local_users'] = $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_disable_otp_local_users');
-		$params['rcdevsopenotp_proxy_host'] = $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_proxy_host');
-		$params['rcdevsopenotp_proxy_password'] = $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_proxy_password');
-		$params['rcdevsopenotp_proxy_port'] = $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_proxy_port');
-		$params['rcdevsopenotp_proxy_username'] = $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_proxy_username');
-		$params['rcdevsopenotp_server_url1'] = $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_server_url1');
-		$params['rcdevsopenotp_server_url2'] = $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_server_url2');
+		$params['rcdevsopenotp_api_key'] = $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_api_key');
+		$params['rcdevsopenotp_authentication_method'] = $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_authentication_method');
+		$params['rcdevsopenotp_client_id'] = $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_client_id');
+		$params['rcdevsopenotp_disable_otp_local_users'] = $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_disable_otp_local_users');
+		$params['rcdevsopenotp_proxy_host'] = $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_proxy_host');
+		$params['rcdevsopenotp_proxy_password'] = $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_proxy_password');
+		$params['rcdevsopenotp_proxy_port'] = $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_proxy_port');
+		$params['rcdevsopenotp_proxy_username'] = $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_proxy_username');
+		$params['rcdevsopenotp_server_url1'] = $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_server_url1');
+		$params['rcdevsopenotp_server_url2'] = $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_server_url2');
 
 		$requestServerUrl = $this->request->getParam('serverUrl', null);
 		if ($requestServerUrl !== null && in_array($serverNumber, ['1', '2'], true)) {
-			$requestServerUrl = trim((string)$requestServerUrl);
+			$requestServerUrl = RequestParamHelper::stringValue($requestServerUrl);
 			$params['rcdevsopenotp_server_url' . $serverNumber] = $requestServerUrl;
 		}
 
 		$appPath = '';
 		try {
-			$appPath = $this->appManager->getAppPath(OpenOTPAuthApp::APP_ID);
+			$appPath = $this->appManager->getAppPath(Config::APP_ID);
 		} catch (\Throwable $th) {
-			$this->logger->warning($th->getMessage(), array('app' => OpenOTPAuthApp::APP_ID));
+			$this->logger->warning($th->getMessage(), array('app' => Config::APP_ID));
 		}
 
 		$openotpAuth = new OpenotpAuth($this->logger, $params, $appPath);
 		$resp = $openotpAuth->openOTPStatus($serverNumber);
 
-		$this->logger->info("OpenOTP server checkd : " . json_encode($resp), array('app' => OpenOTPAuthApp::APP_ID));
+		$this->logger->info("OpenOTP server checkd : " . json_encode($resp), array('app' => Config::APP_ID));
 
-		if (isset($resp['status']) && $resp['status'] === 'true') {
-			return new JSONResponse(
-				[
-					'code' => 1,
-					'status' => true,
-					'message' => nl2br($resp['message']),
-				]
-			);
-		}
+			if (isset($resp['status']) && $resp['status'] === 'true') {
+				$message = RequestParamHelper::stringValue($resp['message'] ?? '');
+				return new JSONResponse(
+					[
+						'code' => 1,
+						'status' => true,
+						'message' => nl2br($message),
+					]
+				);
+			}
 
-		$this->logger->error("Could not connect to host #{$serverNumber}", array('app' => OpenOTPAuthApp::APP_ID));
+		$this->logger->error("Could not connect to host #{$serverNumber}", array('app' => Config::APP_ID));
 		return new JSONResponse(
 			[
 				'code' => 0,

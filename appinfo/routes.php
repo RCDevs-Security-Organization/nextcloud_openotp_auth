@@ -1,9 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
-/*
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+/**
+ *
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -19,7 +18,10 @@ declare(strict_types=1);
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
  */
+
+declare(strict_types=1);
 
 $requirements = [
 	'apiVersion' => 'v(1)',
@@ -45,6 +47,12 @@ return [
 			'name' => 'settings#saveSettings',
 			'url' => '/api/{apiVersion}/settings/save',
 			'verb' => 'POST',
+			'requirements' => $requirements,
+		],
+		[
+			'name' => 'settings#getChangelog',
+			'url' => '/api/{apiVersion}/settings/changelog',
+			'verb' => 'GET',
 			'requirements' => $requirements,
 		],
 	],

@@ -1,6 +1,6 @@
 <!--
  *
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,13 +21,37 @@
 
 <template>
 	<opaMain>
+		<button class="changelog-tab" type="button" :style="{ right: changelogPanelRight }" @click="openChangelog">
+			Changelog
+		</button>
+
+		<transition name="changelog-slide">
+			<aside v-if="changelogOpen" class="changelog-panel" :style="{ left: changelogPanelLeft, right: changelogPanelRight }" aria-modal="true" role="dialog" aria-label="Changelog">
+				<header class="changelog-panel__header">
+					<h2>Changelog</h2>
+					<button class="changelog-panel__close" type="button" aria-label="Close changelog" @click="closeChangelog">
+						×
+					</button>
+				</header>
+				<div class="changelog-panel__body">
+					<p v-if="changelogLoading" class="changelog-panel__state">
+						{{ getT('Loading') }}...
+					</p>
+					<p v-else-if="changelogError" class="changelog-panel__state">
+						{{ changelogError }}
+					</p>
+					<div v-else class="changelog-markdown" v-html="changelogHtml"></div>
+				</div>
+			</aside>
+		</transition>
+
 		<h2>{{ getT('OpenOTP Two-Factor Authentication Settings') }}</h2>
 		<h3>{{ getT('Installed version') }} : {{ installedVersion }}</h3>
 
 		<opaSettingsContainer id="appName">
 			<opaSettingsHeader>
 				<opaItem>{{ getT('Enter your OpenOTP server settings in the fields below.') }}</opaItem>
-				<opaItem>{{ getT('You can also enable or disable Two-Factor Authentication by editing the personal settings on the Users page.') }}</opaItem>
+				<opaItem>{{ getT('Two-Factor Authentication is managed by administrators for users.') }}</opaItem>
 			</opaSettingsHeader>
 
 			<opaSettingsPartsContainer>
@@ -157,13 +181,13 @@
 				<opaSettingsCol>
 					<opaItem class="withSimpleBottomMargin">{{ getT('Disable OpenOTP for local users (use standard authentication)') }}</opaItem>
 					<opaSettingsRow>
-						<NcCheckboxRadioSwitch class="opaChkBox yesNo" :button-variant="true" :checked.sync="disableOtpLocalUsers" value="on" name="disableOtpLocalUsers" type="radio" button-variant-grouped="horizontal">
+						<NcCheckboxRadioSwitch v-model="disableOtpLocalUsers" class="opaChkBox yesNo" :button-variant="true" value="on" name="disableOtpLocalUsers" type="radio" button-variant-grouped="horizontal">
 							{{ getT('Yes') }}
 							<template #icon>
 								<CancelIcon :size="20" />
 							</template>
 						</NcCheckboxRadioSwitch>
-						<NcCheckboxRadioSwitch class="opaChkBox yesNo" :button-variant="true" :checked.sync="disableOtpLocalUsers" value="off" name="disableOtpLocalUsers" type="radio" button-variant-grouped="horizontal">
+						<NcCheckboxRadioSwitch v-model="disableOtpLocalUsers" class="opaChkBox yesNo" :button-variant="true" value="off" name="disableOtpLocalUsers" type="radio" button-variant-grouped="horizontal">
 							{{ getT('No') }}
 							<template #icon>
 								<CheckIcon :size="20" />
@@ -175,8 +199,8 @@
 
 			<opaSettingsPartsContainer>
 				<opaSettingsCol>
-					<NcCheckboxRadioSwitch class="opaChkBox" :checked.sync="authenticationMethod" value="1" name="authenticationMethod" type="radio">{{ getT('Enable OpenOTP for all users (two-factor authentication)') }}</NcCheckboxRadioSwitch>
-					<NcCheckboxRadioSwitch class="opaChkBox" :checked.sync="authenticationMethod" value="0" name="authenticationMethod" type="radio">{{ getT('Disable OpenOTP (standard authentication)') }}</NcCheckboxRadioSwitch>
+					<NcCheckboxRadioSwitch v-model="authenticationMethod" class="opaChkBox" value="1" name="authenticationMethod" type="radio">{{ getT('Enable OpenOTP for all users (two-factor authentication)') }}</NcCheckboxRadioSwitch>
+					<NcCheckboxRadioSwitch v-model="authenticationMethod" class="opaChkBox" value="0" name="authenticationMethod" type="radio">{{ getT('Disable OpenOTP (standard authentication)') }}</NcCheckboxRadioSwitch>
 				</opaSettingsCol>
 			</opaSettingsPartsContainer>
 		</opaSettingsContainer>
@@ -189,7 +213,7 @@ import {loadState} from '@nextcloud/initial-state';
 import axios from '@nextcloud/axios';
 import {showError, showSuccess} from '@nextcloud/dialogs';
 import {generateFilePath, generateUrl} from '@nextcloud/router';
-import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js';
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch';
 import {appName, baseUrl} from '../utils/config.js';
 import {getT, checkServerUrl} from '../utils/utility.js';
 
@@ -210,6 +234,7 @@ const reqServerUrl = {
 	},
 };
 const AUTOSAVE_DELAY = 600;
+const initialSettings = loadState(appName, 'initialSettings') || {};
 
 export default {
 	name: 'AdminSettings',
@@ -238,20 +263,20 @@ export default {
 			serverUrlBeforeEdit: {},
 			// From DB table Settings `oc_appconfig`
 			// Server intel
-			installedVersion: this.$parent.installedVersion,
-			serverUrl1: this.$parent.serverUrl1,
-			serverUrl2: this.$parent.serverUrl2,
-			clientId: this.$parent.clientId,
-			apiKey: this.$parent.apiKey,
+			installedVersion: initialSettings.installedVersion || '',
+			serverUrl1: initialSettings.serverUrl1 || '',
+			serverUrl2: initialSettings.serverUrl2 || '',
+			clientId: initialSettings.clientId || '',
+			apiKey: initialSettings.apiKey || '',
 			// Proxy intel
-			proxyHost: this.$parent.proxyHost,
-			proxyPort: this.$parent.proxyPort,
-			proxyUsername: this.$parent.proxyUsername,
-			proxyPassword: this.$parent.proxyPassword,
+			proxyHost: initialSettings.proxyHost || '',
+			proxyPort: initialSettings.proxyPort || '',
+			proxyUsername: initialSettings.proxyUsername || '',
+			proxyPassword: initialSettings.proxyPassword || '',
 			// Misc intel
-			allowUserAdministerOpenotp: this.$parent.allowUserAdministerOpenotp,
-			disableOtpLocalUsers: this.$parent.disableOtpLocalUsers,
-			authenticationMethod: this.$parent.authenticationMethod,
+			allowUserAdministerOpenotp: initialSettings.allowUserAdministerOpenotp || '',
+			disableOtpLocalUsers: initialSettings.disableOtpLocalUsers || '',
+			authenticationMethod: initialSettings.authenticationMethod || '',
 
 			success: false,
 			failure: false,
@@ -260,6 +285,12 @@ export default {
 			saveTimeout: null,
 			saveInProgress: false,
 			saveAgain: false,
+			changelogOpen: false,
+			changelogLoading: false,
+			changelogError: '',
+			changelogContent: '',
+			changelogPanelLeft: '300px',
+			changelogPanelRight: '0px',
 		};
 	},
 
@@ -294,35 +325,173 @@ export default {
 
 		// Call server check
 		this.testConnection();
+		this.updateChangelogLayout();
+		window.addEventListener('keydown', this.handleKeydown);
+		window.addEventListener('resize', this.updateChangelogLayout);
 	},
 
-	beforeDestroy() {
+	beforeUnmount() {
 		if (this.saveTimeout !== null) {
 			clearTimeout(this.saveTimeout);
 		}
-	},
-
-	beforeMount() {
-		const initialSettings = loadState(appName, 'initialSettings');
-
-		// Server intel
-		this.installedVersion = initialSettings.installedVersion;
-		this.serverUrl1 = initialSettings.serverUrl1;
-		this.serverUrl2 = initialSettings.serverUrl2;
-		this.clientId = initialSettings.clientId;
-		this.apiKey = initialSettings.apiKey;
-		// Proxy intel
-		this.proxyHost = initialSettings.proxyHost;
-		this.proxyPort = initialSettings.proxyPort;
-		this.proxyUsername = initialSettings.proxyUsername;
-		this.proxyPassword = initialSettings.proxyPassword;
-		// Misc intel
-		this.allowUserAdministerOpenotp = initialSettings.allowUserAdministerOpenotp;
-		this.disableOtpLocalUsers = initialSettings.disableOtpLocalUsers;
-		this.authenticationMethod = initialSettings.authenticationMethod;
+		window.removeEventListener('keydown', this.handleKeydown);
+		window.removeEventListener('resize', this.updateChangelogLayout);
 	},
 
 	methods: {
+		handleKeydown(event) {
+			if (event.key === 'Escape' && this.changelogOpen) {
+				this.closeChangelog();
+			}
+		},
+
+		openChangelog() {
+			this.updateChangelogLayout();
+			this.changelogOpen = true;
+
+			if (this.changelogContent || this.changelogLoading) {
+				return;
+			}
+
+			this.changelogLoading = true;
+			this.changelogError = '';
+
+			axios
+				.get(generateUrl(baseUrl + '/api/v1/settings/changelog'))
+				.then((response) => {
+					if (response.data?.status === true) {
+						this.changelogContent = response.data.content || '';
+					} else {
+						this.changelogError = this.getT('Could not read changelog');
+					}
+				})
+				.catch(() => {
+					this.changelogError = this.getT('Could not read changelog');
+				})
+				.finally(() => {
+					this.changelogLoading = false;
+				});
+		},
+
+		closeChangelog() {
+			this.changelogOpen = false;
+		},
+
+		updateChangelogLayout() {
+			const content = this.$el?.closest('#app-content-vue, .app-content')
+				|| document.querySelector('#app-content-vue, .app-content')
+				|| document.querySelector('#content');
+			const contentRect = content?.getBoundingClientRect();
+			const bodyStyles = window.getComputedStyle(document.body);
+			const bodyContainerMargin = parseFloat(bodyStyles.getPropertyValue('--body-container-margin')) || 0;
+			const contentRight = contentRect && contentRect.right > 0 ? window.innerWidth - contentRect.right : 0;
+			this.changelogPanelRight = `${Math.max(bodyContainerMargin, Math.ceil(contentRight))}px`;
+
+			if (window.innerWidth < 1024) {
+				this.changelogPanelLeft = '0px';
+				return;
+			}
+
+			const navigation = document.querySelector('#app-navigation, #app-navigation-vue');
+			const navigationRect = navigation?.getBoundingClientRect();
+
+			if (!navigationRect || navigationRect.right <= 0) {
+				this.changelogPanelLeft = '300px';
+				return;
+			}
+
+			this.changelogPanelLeft = `${Math.ceil(navigationRect.right)}px`;
+		},
+
+		escapeHtml(value) {
+			return String(value)
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;')
+				.replace(/'/g, '&#039;');
+		},
+
+		renderInlineMarkdown(value) {
+			return this.escapeHtml(value)
+				.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+				.replace(/`([^`]+)`/g, '<code>$1</code>')
+				.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>');
+		},
+
+		renderMarkdown(markdown) {
+			let inList = false;
+			let inCode = false;
+			const html = [];
+
+			markdown.split(/\r?\n/).forEach((line) => {
+				if (line.trim().startsWith('```')) {
+					if (inCode) {
+						html.push('</code></pre>');
+						inCode = false;
+					} else {
+						if (inList) {
+							html.push('</ul>');
+							inList = false;
+						}
+						html.push('<pre><code>');
+						inCode = true;
+					}
+					return;
+				}
+
+				if (inCode) {
+					html.push(this.escapeHtml(line) + '\n');
+					return;
+				}
+
+				if (line.trim() === '') {
+					if (inList) {
+						html.push('</ul>');
+						inList = false;
+					}
+					return;
+				}
+
+				const title = line.match(/^(#{1,4})\s+(.+)$/);
+				if (title) {
+					if (inList) {
+						html.push('</ul>');
+						inList = false;
+					}
+					const level = title[1].length;
+					html.push(`<h${level}>${this.renderInlineMarkdown(title[2])}</h${level}>`);
+					return;
+				}
+
+				const item = line.match(/^\s*[-*]\s+(.+)$/);
+				if (item) {
+					if (!inList) {
+						html.push('<ul>');
+						inList = true;
+					}
+					html.push(`<li>${this.renderInlineMarkdown(item[1])}</li>`);
+					return;
+				}
+
+				if (inList) {
+					html.push('</ul>');
+					inList = false;
+				}
+
+				html.push(`<p>${this.renderInlineMarkdown(line)}</p>`);
+			});
+
+			if (inList) {
+				html.push('</ul>');
+			}
+			if (inCode) {
+				html.push('</code></pre>');
+			}
+
+			return html.join('');
+		},
+
 		clearIcons() {
 			this.reqServerUrl['1'].enable = false;
 			this.reqServerUrl['2'].enable = false;
@@ -401,7 +570,7 @@ export default {
 					this.success = true;
 					this.saved = true;
 					if (!this.saveAgain) {
-						showSuccess(this.getT('OpenOTP settings saved'));
+						showSuccess(this.getT('OpenOTP settings saved'), {timeout: 2000});
 					}
 				})
 				.catch((error) => {
@@ -436,6 +605,12 @@ export default {
 
 		updateId(wspId) {
 			this.workspaceId = wspId;
+		},
+	},
+
+	computed: {
+		changelogHtml() {
+			return this.renderMarkdown(this.changelogContent);
 		},
 	},
 };

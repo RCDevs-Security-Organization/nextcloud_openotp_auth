@@ -1,7 +1,30 @@
-opamain {
+/**
+ *
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
+ *
+ * @license GNU AGPL version 3 or any later version
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+ opamain {
     padding: 16px;
     display: flex;
     flex-flow: column;
+	position: relative;
+	/* min-height: calc(100vh - 64px); */
 }
 
 opaSettingsContainer {
@@ -89,4 +112,146 @@ opaItem * {
 
 .opaClickable {
 	cursor: pointer;
+}
+
+/* CHANGELOG */
+.changelog-tab {
+	position: fixed;
+	top: var(--header-height, 50px);
+	right: 0;
+	z-index: 1200;
+	width: 36px;
+	min-height: 108px;
+	margin: 0 !important;
+	padding: 12px 6px;
+	border: 0;
+	border-radius: 0 !important;
+	border-bottom-left-radius: var(--body-container-radius) !important;
+	background: #ee841fff !important;
+	background-color: #ee841fff !important;
+	color: #fff !important;
+	font-weight: 700;
+	letter-spacing: 0;
+	writing-mode: vertical-rl;
+	transform: rotate(180deg);
+	cursor: pointer;
+}
+
+@media only screen and (width < 1024px) {
+	.changelog-tab {
+		border-bottom-left-radius: var(--border-radius-large) !important;
+	}
+}
+
+.changelog-panel {
+	position: fixed;
+	top: var(--header-height, 50px);
+	right: 0;
+	bottom: var(--body-container-margin, 0);
+	z-index: 1300;
+	background: var(--color-main-background, #fff);
+	border-start-end-radius: var(--body-container-radius) !important;
+	border-end-end-radius: var(--body-container-radius) !important;
+	box-shadow: -8px 0 24px rgba(0, 0, 0, 0.18);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.changelog-panel__header {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 92px;
+	padding: 36px 60px 16px 24px;
+	border-bottom: 1px solid var(--color-border, #d8d8d8);
+}
+
+.changelog-panel__header h2 {
+	margin: 0;
+}
+
+.changelog-panel__close {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 36px;
+	height: 36px;
+	border: 0;
+	border-radius: 0;
+	border-bottom-left-radius: var(--border-radius-large) !important;
+	background: transparent;
+	color: var(--color-main-text, #222);
+	font-size: 24px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+@media only screen and (width < 1024px) {
+	.changelog-panel {
+		border-start-end-radius: var(--border-radius-large) !important;
+		border-end-end-radius: var(--border-radius-large) !important;
+	}
+}
+
+.changelog-panel__close:hover,
+.changelog-panel__close:focus {
+	background: var(--color-background-hover, #f0f0f0);
+}
+
+.changelog-panel__body {
+	flex: 1;
+	overflow: auto;
+	padding: 24px;
+}
+
+.changelog-panel__state {
+	margin: 0;
+}
+
+.changelog-markdown {
+	max-width: 760px;
+	line-height: 1.55;
+}
+
+.changelog-markdown h1,
+.changelog-markdown h2,
+.changelog-markdown h3,
+.changelog-markdown h4 {
+	margin: 22px 0 10px;
+}
+
+.changelog-markdown h1:first-child,
+.changelog-markdown h2:first-child,
+.changelog-markdown h3:first-child,
+.changelog-markdown h4:first-child {
+	margin-top: 0;
+}
+
+.changelog-markdown p,
+.changelog-markdown ul {
+	margin: 0 0 12px;
+}
+
+.changelog-markdown ul {
+	padding-left: 22px;
+}
+
+.changelog-markdown pre {
+	padding: 12px;
+	overflow: auto;
+	border-radius: 6px;
+	background: var(--color-background-dark, #f6f6f6);
+}
+
+.changelog-slide-enter-active,
+.changelog-slide-leave-active {
+	transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.changelog-slide-enter,
+.changelog-slide-leave-to {
+	opacity: 0;
+	transform: translateX(100%);
 }

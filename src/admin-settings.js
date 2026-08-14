@@ -1,6 +1,6 @@
 /**
  *
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -19,19 +19,18 @@
  *
  */
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 import AdminSettings from './views/AdminSettings.vue'
 
 // Styles
 import '@nextcloud/dialogs/style.css'
 
-Vue.prototype.t = t
-Vue.prototype.n = n
-Vue.prototype.OC = OC
-Vue.prototype.OCA = OCA
-Vue.prototype.OCP = OCP
+const app = createApp(AdminSettings)
 
-export default new Vue({
-	el: '#admin_settings',
-	render: h => h(AdminSettings),
-})
+app.config.globalProperties.t = t
+app.config.globalProperties.n = n
+app.config.globalProperties.OC = OC
+app.config.globalProperties.OCA = OCA
+app.config.globalProperties.OCP = OCP
+
+export default app.mount('#admin_settings')

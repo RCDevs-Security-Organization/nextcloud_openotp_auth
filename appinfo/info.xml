@@ -24,7 +24,7 @@ It is enterprise-ready with strong support for:
 * ... and much more.
 	</description>
 
-	<version>1.33.0</version>
+	<version>1.34.0</version>
 	<licence>agpl</licence>
 	<author>RCDevs</author>
 	<namespace>OpenOTPAuth</namespace>
@@ -34,12 +34,12 @@ It is enterprise-ready with strong support for:
 	<bugs>https://github.com/rcdevs/nextcloud_openotp_auth/issues</bugs>
 	<repository type="git">https://github.com/rcdevs/nextcloud_openotp_auth.git</repository>
 
-	<screenshot>https://raw.githubusercontent.com/rcdevs/nextcloud_openotp_auth/N33/screenshots/openotp_auth_admin.png</screenshot>
-	<screenshot>https://raw.githubusercontent.com/rcdevs/nextcloud_openotp_auth/N33/screenshots/openotp_auth_fido2.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/rcdevs/nextcloud_openotp_auth/N34/screenshots/openotp_auth_admin.png</screenshot>
+	<screenshot>https://raw.githubusercontent.com/rcdevs/nextcloud_openotp_auth/N34/screenshots/openotp_auth_fido2.png</screenshot>
 
 	<dependencies>
-		<php min-version="8.2" max-version="8.4"/>
-		<nextcloud min-version="33" max-version="33"/>
+		<php min-version="8.3" max-version="8.5"/>
+		<nextcloud min-version="34" max-version="34"/>
 	</dependencies>
 
 	<repair-steps>

@@ -2,7 +2,7 @@
 
 /**
  *
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,24 +21,23 @@
  *
  */
 
-use OCA\OpenOTPAuth\AppInfo\Application as OpenOTPAuthApp;
+declare(strict_types=1);
 
-// script(OpenOTPAuthApp::APP_ID, 'openotp_auth-main-login-setup');
-// style(OpenOTPAuthApp::APP_ID, 'openotp_auth-main-login-setup');
+use OC\Security\CSP\ContentSecurityPolicyNonceManager;
+use OCP\Server;
 
+/** @var array<string, mixed> $_ Template parameters injected by Nextcloud. */
+/** @var \OCP\IL10N $l Template translator injected by Nextcloud. */
 
-if (!isset($rcdevsopenotp_timeout)) {
-	$rcdevsopenotp_timeout = 0;
-}
-$rcdevsopenotp_message = "";
-if (is_array($_['challenge_params'])) extract($_['challenge_params']);
+$challengeParams = is_array($_['challenge_params'] ?? null) ? $_['challenge_params'] : [];
+
+$rcdevsopenotp_otpChallenge = $challengeParams['rcdevsopenotp_otpChallenge'] ?? null;
+$rcdevsopenotp_u2fChallenge = $challengeParams['rcdevsopenotp_u2fChallenge'] ?? null;
+$rcdevsopenotp_voiceLogin = $challengeParams['rcdevsopenotp_voiceLogin'] ?? null;
+$rcdevsopenotp_message = (string)($challengeParams['rcdevsopenotp_message'] ?? '');
+$rcdevsopenotp_timeout = (int)($challengeParams['rcdevsopenotp_timeout'] ?? 0);
+$rcdevsopenotp_appWebPath = (string)($challengeParams['rcdevsopenotp_appWebPath'] ?? '');
 ?>
-<style>
-	html #body-login .warning {
-		margin: 0;
-	}
-</style>
-
 <?php if ($_['error_msg']) : ?>
 	<fieldset style="margin:6px 0 15px 0;" class="warning">
 		<legend><?php p($l->t('System throws this exception(s):')); ?></legend>
@@ -66,8 +65,8 @@ if (is_array($_['challenge_params'])) extract($_['challenge_params']);
 					endif; ?>
 		</p>
 		<?php if (!$_['error_msg']) { ?>
-			<p id="timout_cell" style="padding:10px 0; font-style:italic;"><?php p($l->t('Timeout:')); ?> <span id="timeout"><?php p($rcdevsopenotp_timeout) . " " . p($l->t('seconds')); ?></p>
-			<?php foreach ($_['challenge_params'] as $param => $val) { ?>
+			<p id="timout_cell" style="padding:10px 0; font-style:italic;"><?php p($l->t('Timeout:')); ?> <span id="timeout"><?php p($rcdevsopenotp_timeout); ?> <?php p($l->t('seconds')); ?></span></p>
+			<?php foreach ($challengeParams as $param => $val) { ?>
 				<input type="hidden" name="<?php p($param); ?>" value="<?php p($val); ?>">
 			<?php } ?>
 
@@ -109,7 +108,126 @@ if (is_array($_['challenge_params'])) extract($_['challenge_params']);
 	<?php } ?>
 </form>
 
-<script type="text/javascript" nonce="<?php p(\OC::$server->getContentSecurityPolicyNonceManager()->getNonce()) ?>">
+<script type="text/javascript" nonce="<?php p(Server::get(ContentSecurityPolicyNonceManager::class)->getNonce()) ?>">
+	function $(selector) {
+		let elements = [];
+
+		if (selector === document) {
+			elements = [document];
+		} else if (typeof selector === 'string') {
+			elements = Array.from(document.querySelectorAll(selector));
+		} else if (selector instanceof Element || selector === window) {
+			elements = [selector];
+		}
+
+		const api = {
+			ready(callback) {
+				if (document.readyState === 'loading') {
+					document.addEventListener('DOMContentLoaded', callback);
+				} else {
+					callback();
+				}
+				return api;
+			},
+				on(eventName, childSelector, callback) {
+					if (typeof childSelector === 'function') {
+						elements.forEach((element) => element.addEventListener(eventName, childSelector));
+						return api;
+					}
+
+					elements.forEach((element) => {
+						element.addEventListener(eventName, (event) => {
+							const target = event.target.closest(childSelector);
+							if (target) {
+								callback.call(target, event);
+							}
+						});
+					});
+					return api;
+				},
+				click(callback) {
+					elements.forEach((element) => element.addEventListener('click', callback));
+					return api;
+				},
+				submit(callback) {
+					if (typeof callback === 'function') {
+						elements.forEach((element) => element.addEventListener('submit', callback));
+						return api;
+					}
+
+					elements.forEach((element) => {
+						if (typeof element.requestSubmit === 'function') {
+							element.requestSubmit();
+						} else if (typeof HTMLFormElement.prototype.submit === 'function') {
+							HTMLFormElement.prototype.submit.call(element);
+						}
+					});
+					return api;
+				},
+				animate(properties) {
+					elements.forEach((element) => Object.assign(element.style, properties));
+					return api;
+				},
+			html(value) {
+				if (value === undefined) {
+					return elements[0]?.innerHTML;
+				}
+				elements.forEach((element) => {
+					element.innerHTML = value;
+				});
+				return api;
+			},
+			css(property, value) {
+				if (value === undefined) {
+					return elements[0] ? getComputedStyle(elements[0])[property] : undefined;
+				}
+				elements.forEach((element) => {
+					element.style[property] = value;
+				});
+				return api;
+			},
+			attr(name, value) {
+				if (value === undefined) {
+					return elements[0]?.getAttribute(name);
+				}
+				elements.forEach((element) => {
+					if (name === 'value') {
+						element.value = value;
+					}
+					element.setAttribute(name, value);
+				});
+				return api;
+			},
+			prop(name, value) {
+				if (value === undefined) {
+					return elements[0]?.[name];
+				}
+				elements.forEach((element) => {
+					element[name] = value;
+				});
+				return api;
+			},
+			val(value) {
+				if (value === undefined) {
+					return elements[0]?.value;
+				}
+				elements.forEach((element) => {
+					element.value = value;
+				});
+				return api;
+			},
+			width() {
+				return elements[0]?.offsetWidth || 0;
+			},
+			addClass(className) {
+				elements.forEach((element) => element.classList.add(className));
+				return api;
+			},
+		};
+
+		return api;
+	}
+
 	document.addEventListener('DOMContentLoaded', function() {
 		$(document).ready(function() {
 			/* Helpers */
