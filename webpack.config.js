@@ -1,5 +1,5 @@
 /**
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -18,14 +18,29 @@
  */
 
 const path = require('path')
+const fs = require('fs')
 const webpack = require('webpack')
 const webpackConfig = require('@nextcloud/webpack-vue-config')
 
+class CopyChallengeScriptsPlugin {
+	apply(compiler) {
+		compiler.hooks.afterEmit.tap('CopyChallengeScriptsPlugin', () => {
+			const sourceDir = path.join(__dirname, 'src', 'challenge-scripts')
+			const targetDir = path.join(compiler.options.output.path || path.join(__dirname, 'js'), 'challenge')
+
+			fs.mkdirSync(targetDir, { recursive: true })
+
+			for (const fileName of fs.readdirSync(sourceDir)) {
+				if (fileName.endsWith('.js')) {
+					fs.copyFileSync(path.join(sourceDir, fileName), path.join(targetDir, fileName))
+				}
+			}
+		})
+	}
+}
+
 // Supprimer l’entrée par défaut
 delete webpackConfig.entry['main']
-webpackConfig.entry['challenge'] = path.join(__dirname, 'src', 'main-challenge.js')
-webpackConfig.entry['settings'] = path.join(__dirname, 'src', 'main-settings.js')
-webpackConfig.entry['login-setup'] = path.join(__dirname, 'src', 'main-login-setup.js')
 webpackConfig.entry['admin-settings'] = path.join(__dirname, 'src', 'admin-settings.js')
 
 // Add .js extension as fallback for fully-specified ESM imports
@@ -49,7 +64,8 @@ webpackConfig.plugins = [
 	new webpack.ProvidePlugin({
 		process: 'process/browser',
 		Buffer: ['buffer', 'Buffer']
-	})
+	}),
+	new CopyChallengeScriptsPlugin()
 ]
 
 // Important: disable module concatenation to avoid bugs with ESM

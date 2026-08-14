@@ -1,6 +1,6 @@
 /**
  *
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -18,7 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-
 
 const appName = 'openotp_auth';
 const baseUrl = `apps/${appName}`;

@@ -24,7 +24,7 @@ It is enterprise-ready with strong support for:
 * ... and much more.
 	</description>
 
-	<version>1.33.0</version>
+	<version>1.33.1</version>
 	<licence>agpl</licence>
 	<author>RCDevs</author>
 	<namespace>OpenOTPAuth</namespace>
@@ -38,7 +38,7 @@ It is enterprise-ready with strong support for:
 	<screenshot>https://raw.githubusercontent.com/rcdevs/nextcloud_openotp_auth/N33/screenshots/openotp_auth_fido2.png</screenshot>
 
 	<dependencies>
-		<php min-version="8.2" max-version="8.4"/>
+		<php min-version="8.2" max-version="8.5"/>
 		<nextcloud min-version="33" max-version="33"/>
 	</dependencies>
 

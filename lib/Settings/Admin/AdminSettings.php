@@ -2,7 +2,7 @@
 
 /**
  *
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,54 +21,50 @@
  *
  */
  
+declare(strict_types=1);
+
 /**
  * OpenOTP authentication Config
  * @package openotp_auth
  */
 namespace OCA\OpenOTPAuth\Settings\Admin;
 
-use OCA\OpenOTPAuth\AppInfo\Application as OpenOTPAuthApp;
 use OCA\OpenOTPAuth\Config;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
-use OCP\IConfig;
-use OCP\Settings\ISettings;
+use OCP\IAppConfig;
+use OCP\Settings\IDelegatedSettings;
 use OCP\Util;
 
-class AdminSettings implements ISettings
+class AdminSettings implements IDelegatedSettings
 {	
-		/** @var IConfig */
-		// protected $config;
-	
-		/**
-		 * @param IConfig $config
-		 */
-		public function __construct(private IConfig $config, private IInitialState $initialState)
+		public function __construct(private IAppConfig $appConfig, private IInitialState $initialState)
 		{
 		}
 	
 		/**
-		 * @return TemplateResponse
+		 * @return TemplateResponse<Http::STATUS_OK, array<string, mixed>>
 		 */
 		public function getForm(): TemplateResponse
 		{
 			$initialSettings = [
 	
-				//'server_url' =>         $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'server_url'),
+				//'server_url' =>         $this->appConfig->getValueString(Config::APP_ID, 'server_url'),
 	
-				'installedVersion'  			=> $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'installed_version'),
-				'apiKey'            			=> $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_api_key'),
-				'serverUrl1'      				=> $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_server_url1'),
-				'serverUrl2'    				=> $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_server_url2'),
-				'clientId'						=> $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_client_id'),
-				'proxyHost'         			=> $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_proxy_host'),
-				'proxyPort'         			=> $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_proxy_port'),
-				'proxyUsername'     			=> $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_proxy_username'),
-				'proxyPassword'     			=> $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_proxy_password'),
-				'allowUserAdministerOpenotp'	=> $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_allow_user_administer_openotp'),
-				'disableOtpLocalUsers'          => $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_disable_otp_local_users'),
-				'authenticationMethod'          => $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'rcdevsopenotp_authentication_method'),
-				// 'types'          				=> $this->config->getAppValue(OpenOTPAuthApp::APP_ID, 'types'),
+				'installedVersion'  			=> $this->appConfig->getValueString(Config::APP_ID, 'installed_version'),
+				'apiKey'            			=> $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_api_key'),
+				'serverUrl1'      				=> $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_server_url1'),
+				'serverUrl2'    				=> $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_server_url2'),
+				'clientId'						=> $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_client_id'),
+				'proxyHost'         			=> $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_proxy_host'),
+				'proxyPort'         			=> $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_proxy_port'),
+				'proxyUsername'     			=> $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_proxy_username'),
+				'proxyPassword'     			=> $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_proxy_password'),
+				'allowUserAdministerOpenotp'	=> $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_allow_user_administer_openotp'),
+				'disableOtpLocalUsers'          => $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_disable_otp_local_users'),
+				'authenticationMethod'          => $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_authentication_method'),
+				// 'types'          				=> $this->appConfig->getValueString(Config::APP_ID, 'types'),
 			];
 	
 			$this->initialState->provideInitialState('initialSettings', $initialSettings);
@@ -89,7 +85,18 @@ class AdminSettings implements ISettings
 		 */
 		public function getSection(): string
 		{
-			return OpenOTPAuthApp::APP_ID;
+			return Config::APP_ID;
+		}
+
+		public function getName(): ?string
+		{
+			return null;
+		}
+
+		/** @return array<string, list<string>> */
+		public function getAuthorizedAppConfig(): array
+		{
+			return Config::getAuthorizedAppConfig();
 		}
 	
 		/**

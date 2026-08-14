@@ -1,3 +1,5 @@
+<?php
+
 /**
  *
  * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
@@ -19,20 +21,34 @@
  *
  */
 
-.icon-openotp_auth-sign {
-	background-image: var(--icon-openotp_auth-dark);
-}
+declare(strict_types=1);
 
-@media (prefers-color-scheme: dark) {
-	:root {
-		--icon-openotp_auth-dark: url(../../img/app.svg);
+namespace OCA\OpenOTPAuth\Helper;
+
+use OCP\IRequest;
+use Stringable;
+
+class RequestParamHelper {
+	/**
+	 * @param array<string,mixed> $params
+	 */
+	public static function stringParam(array $params, string $key, string $default = ''): string {
+		return self::stringValue($params[$key] ?? $default, $default);
 	}
-}
 
-[data-themes*=dark] {
-	--icon-openotp_auth-dark: url(../../img/app.svg);
-}
+	public static function requestStringParam(IRequest $request, string $key, string $default = ''): string {
+		return self::stringValue($request->getParam($key, $default), $default);
+	}
 
-[data-themes*=light] {
-	--icon-openotp_auth-dark: url(../../img/app-dark.svg);
+	public static function stringValue(mixed $value, string $default = ''): string {
+		if ($value === null) {
+			return $default;
+		}
+
+		if (is_scalar($value) || $value instanceof Stringable) {
+			return trim((string)$value);
+		}
+
+		return $default;
+	}
 }

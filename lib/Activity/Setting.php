@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,9 +21,11 @@ declare(strict_types=1);
  *
  */
 
+declare(strict_types=1);
+
 namespace OCA\OpenOTPAuth\Activity;
 
-use OCA\OpenOTPAuth\AppInfo\Application as OpenOTPAuthApp;
+use OCA\OpenOTPAuth\Config;
 use OCP\Activity\ISetting;
 use OCP\IL10N;
 
@@ -59,7 +59,7 @@ class Setting implements ISetting {
 	 * @return string
 	 */
 	public function getIdentifier() {
-		return OpenOTPAuthApp::APP_ID;
+		return Config::APP_ID;
 	}
 
 	/**

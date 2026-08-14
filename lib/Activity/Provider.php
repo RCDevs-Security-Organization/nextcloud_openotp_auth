@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,14 +20,15 @@ declare(strict_types=1);
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+
+declare(strict_types=1);
  
 namespace OCA\OpenOTPAuth\Activity;
 
 use InvalidArgumentException;
-use OCA\OpenOTPAuth\AppInfo\Application as OpenOTPAuthApp;
+use OCA\OpenOTPAuth\Config;
 use OCP\Activity\IEvent;
 use OCP\Activity\IProvider;
-use OCP\ILogger;
 use OCP\IURLGenerator;
 use OCP\L10N\IFactory as L10nFactory;
 
@@ -41,16 +40,11 @@ class Provider implements IProvider {
 	/** @var IURLGenerator */
 	private $urlGenerator;
 
-	/** @var ILogger */
-	private $logger;
-
 	/**
 	 * @param L10nFactory $l10n
 	 * @param IURLGenerator $urlGenerator
-	 * @param ILogger $logger
 	 */
-	public function __construct(L10nFactory $l10n, IURLGenerator $urlGenerator, ILogger $logger) {
-		$this->logger = $logger;
+	public function __construct(L10nFactory $l10n, IURLGenerator $urlGenerator) {
 		$this->urlGenerator = $urlGenerator;
 		$this->l10n = $l10n;
 	}
@@ -63,11 +57,11 @@ class Provider implements IProvider {
 	 * @throws InvalidArgumentException
 	 */
 	public function parse($language, IEvent $event, ?IEvent $previousEvent = null) {
-		if ($event->getApp() !== OpenOTPAuthApp::APP_ID) {
+		if ($event->getApp() !== Config::APP_ID) {
 			throw new InvalidArgumentException();
 		}
 
-		$l = $this->l10n->get(OpenOTPAuthApp::APP_ID, $language);
+		$l = $this->l10n->get(Config::APP_ID, $language);
 
 		$event->setIcon($this->urlGenerator->getAbsoluteURL($this->urlGenerator->imagePath('core', 'actions/password.svg')));
 		switch ($event->getSubject()) {

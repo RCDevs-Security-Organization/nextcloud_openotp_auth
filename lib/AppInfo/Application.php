@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,18 +21,17 @@ declare(strict_types=1);
  *
  */
 
+declare(strict_types=1);
+
 namespace OCA\OpenOTPAuth\AppInfo;
 
 use OCA\OpenOTPAuth\Event\DisabledByAdmin;
 use OCA\OpenOTPAuth\Event\StateChanged;
 use OCA\OpenOTPAuth\Listener\StateChangeActivity;
-use OCA\OpenOTPAuth\Listener\StateChangeRegistryUpdater;
-use OCA\OpenOTPAuth\Listener\UserDeleted;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
-use OCP\User\Events\UserDeletedEvent;
 
 class Application extends App implements IBootstrap {
 	public const APP_ID = 'openotp_auth';
@@ -50,9 +47,7 @@ class Application extends App implements IBootstrap {
 		}
 
 		$context->registerEventListener(StateChanged::class, StateChangeActivity::class);
-		$context->registerEventListener(StateChanged::class, StateChangeRegistryUpdater::class);
 		$context->registerEventListener(DisabledByAdmin::class, StateChangeActivity::class);
-		$context->registerEventListener(UserDeletedEvent::class, UserDeleted::class);
 	}
 
 	public function boot(IBootContext $context): void {

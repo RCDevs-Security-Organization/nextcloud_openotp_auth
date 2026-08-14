@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,9 +21,11 @@ declare(strict_types=1);
  *
  */
 
+declare(strict_types=1);
+
 namespace OCA\OpenOTPAuth\Listener;
 
-use OCA\OpenOTPAuth\AppInfo\Application as OpenOTPAuthApp;
+use OCA\OpenOTPAuth\Config;
 use OCA\OpenOTPAuth\Event\DisabledByAdmin;
 use OCA\OpenOTPAuth\Event\StateChanged;
 use OCP\Activity\IManager;
@@ -33,7 +33,7 @@ use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 
 /**
- * @template-implements IEventListener<StateChanged>
+ * @template-implements IEventListener<Event>
  */
 class StateChangeActivity implements IEventListener {
 
@@ -45,20 +45,23 @@ class StateChangeActivity implements IEventListener {
 	}
 
 	public function handle(Event $event): void {
-		if ($event instanceof StateChanged) {
-			if ($event instanceof DisabledByAdmin) {
-				$subject = 'openotp_disabled_by_admin';
-			} else {
-				$subject = $event->isEnabled() ? 'openotp_device_added' : 'openotp_device_removed';
-			}
-
-			$activity = $this->activityManager->generateEvent();
-			$activity->setApp(OpenOTPAuthApp::APP_ID)
-				->setType('security')
-				->setAuthor($event->getUser()->getUID())
-				->setAffectedUser($event->getUser()->getUID())
-				->setSubject($subject);
-			$this->activityManager->publish($activity);
+		if (!$event instanceof StateChanged) {
+			return;
 		}
+
+		if ($event instanceof DisabledByAdmin) {
+			$subject = 'openotp_disabled_by_admin';
+		} else {
+			$subject = $event->isEnabled() ? 'openotp_device_added' : 'openotp_device_removed';
+		}
+
+		$userId = $event->getUser()->getUID();
+		$activity = $this->activityManager->generateEvent();
+		$activity->setApp(Config::APP_ID)
+			->setType('security')
+			->setAuthor($userId)
+			->setAffectedUser($userId)
+			->setSubject($subject);
+		$this->activityManager->publish($activity);
 	}
 }

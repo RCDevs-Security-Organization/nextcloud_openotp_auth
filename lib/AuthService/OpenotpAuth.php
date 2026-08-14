@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  *
- * @copyright Copyright (c) 2025, RCDevs (info@rcdevs.com)
+ * @copyright Copyright (c) 2026, RCDevs (info@rcdevs.com)
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,11 +21,14 @@ declare(strict_types=1);
  *
  */
 
+declare(strict_types=1);
+
 namespace OCA\OpenOTPAuth\AuthService;
 
 use Exception;
 use nusoap_client;
-use OCA\OpenOTPAuth\AppInfo\Application as OpenOTPAuthApp;
+use OCA\OpenOTPAuth\Config;
+use OCA\OpenOTPAuth\Helper\RequestParamHelper;
 use Psr\Log\LoggerInterface;
 
 class OpenotpAuthException extends Exception
@@ -39,7 +40,7 @@ class OpenotpAuth
 	private const NB_SERVERS = 2;
 
 	private string $home;
-	/** @var array<string,string> */
+	/** @var array<int,string> */
 	private array $serverUrls;
 	private string $clientId;
 	private string $apiKey;
@@ -65,15 +66,15 @@ class OpenotpAuth
 		$this->home = $home;
 		$this->sourceIp = $sourceIp;
 		$this->serverUrls = [
-			'1' => trim((string)($params['rcdevsopenotp_server_url1'] ?? '')),
-			'2' => trim((string)($params['rcdevsopenotp_server_url2'] ?? '')),
+			'1' => RequestParamHelper::stringParam($params, 'rcdevsopenotp_server_url1'),
+			'2' => RequestParamHelper::stringParam($params, 'rcdevsopenotp_server_url2'),
 		];
-		$this->clientId = trim((string)($params['rcdevsopenotp_client_id'] ?? ''));
-		$this->apiKey = trim((string)($params['rcdevsopenotp_api_key'] ?? ''));
-		$this->proxyHost = trim((string)($params['rcdevsopenotp_proxy_host'] ?? ''));
-		$this->proxyPort = trim((string)($params['rcdevsopenotp_proxy_port'] ?? ''));
-		$this->proxyUsername = trim((string)($params['rcdevsopenotp_proxy_username'] ?? ''));
-		$this->proxyPassword = trim((string)($params['rcdevsopenotp_proxy_password'] ?? ''));
+		$this->clientId = RequestParamHelper::stringParam($params, 'rcdevsopenotp_client_id');
+		$this->apiKey = RequestParamHelper::stringParam($params, 'rcdevsopenotp_api_key');
+		$this->proxyHost = RequestParamHelper::stringParam($params, 'rcdevsopenotp_proxy_host');
+		$this->proxyPort = RequestParamHelper::stringParam($params, 'rcdevsopenotp_proxy_port');
+		$this->proxyUsername = RequestParamHelper::stringParam($params, 'rcdevsopenotp_proxy_username');
+		$this->proxyPassword = RequestParamHelper::stringParam($params, 'rcdevsopenotp_proxy_password');
 	}
 
 	public function checkFile(string $file): bool
@@ -81,7 +82,7 @@ class OpenotpAuth
 		return file_exists($this->home . '/' . $file);
 	}
 
-	/** @return array<string,string> */
+	/** @return array<int,string> */
 	public function getServerUrls(): array
 	{
 		return $this->serverUrls;
@@ -116,12 +117,47 @@ class OpenotpAuth
 		return $this->contextTime;
 	}
 
+	private function formatSoapFaultMessage(string $method, mixed $response): string
+	{
+		$faultCode = '';
+		$faultString = '';
+
+		if (is_array($response)) {
+			$faultCode = RequestParamHelper::stringValue($response['faultcode'] ?? '');
+			$faultString = RequestParamHelper::stringValue($response['faultstring'] ?? '');
+		}
+
+		if ($faultCode === '' && $faultString === '') {
+			return $method . ', error: SOAP fault without details';
+		}
+
+		return $method . ', error: ' . $faultCode . ' / ' . $faultString;
+	}
+
+	/** @return array<string,mixed>|false */
+	private function normalizeSoapResponse(mixed $response): array|false
+	{
+		if (!is_array($response)) {
+			return false;
+		}
+
+		$result = [];
+		foreach ($response as $key => $value) {
+			if (!is_string($key)) {
+				return false;
+			}
+			$result[$key] = $value;
+		}
+
+		return $result;
+	}
+
 	private function soapRequest(string $serverId): bool
 	{
-		$proxyHost = false;
-		$proxyPort = false;
-		$proxyUsername = false;
-		$proxyPassword = false;
+		$proxyHost = '';
+		$proxyPort = '';
+		$proxyUsername = '';
+		$proxyPassword = '';
 
 		if ($this->proxyHost !== '' && $this->proxyPort !== '') {
 			$proxyHost = $this->proxyHost;
@@ -173,19 +209,19 @@ class OpenotpAuth
 			], 'urn:openotp', '', false, null, 'rpc', 'literal');
 
 			if ($this->soapClient?->fault) {
-				$message = __METHOD__ . ', error: ' . $resp['faultcode'] . ' / ' . $resp['faultstring'];
-				$this->logger->error($message, ['app' => OpenOTPAuthApp::APP_ID]);
+				$message = $this->formatSoapFaultMessage(__METHOD__, $resp);
+				$this->logger->error($message, ['app' => Config::APP_ID]);
 				return false;
 			}
 
 			$err = $this->soapClient?->getError();
 			if ($err) {
 				$message = __METHOD__ . ', error: ' . $err;
-				$this->logger->error($message, ['app' => OpenOTPAuthApp::APP_ID]);
+				$this->logger->error($message, ['app' => Config::APP_ID]);
 				continue;
 			}
 
-			return is_array($resp) ? $resp : false;
+			return $this->normalizeSoapResponse($resp);
 		}
 
 		return false;
@@ -206,19 +242,19 @@ class OpenotpAuth
 			], 'urn:openotp', '', false, null, 'rpc', 'literal');
 
 			if ($this->soapClient?->fault) {
-				$message = __METHOD__ . ', error: ' . $resp['faultcode'] . ' / ' . $resp['faultstring'];
-				$this->logger->error($message, ['app' => OpenOTPAuthApp::APP_ID]);
+				$message = $this->formatSoapFaultMessage(__METHOD__, $resp);
+				$this->logger->error($message, ['app' => Config::APP_ID]);
 				return false;
 			}
 
 			$err = $this->soapClient?->getError();
 			if ($err) {
 				$message = __METHOD__ . ', error: ' . $err;
-				$this->logger->error($message, ['app' => OpenOTPAuthApp::APP_ID]);
+				$this->logger->error($message, ['app' => Config::APP_ID]);
 				continue;
 			}
 
-			return is_array($resp) ? $resp : false;
+			return $this->normalizeSoapResponse($resp);
 		}
 
 		return false;
@@ -229,6 +265,6 @@ class OpenotpAuth
 	{
 		$this->soapRequest($serverNumber);
 		$resp = $this->soapClient?->call('openotpStatus', []);
-		return is_array($resp) ? $resp : false;
+		return $this->normalizeSoapResponse($resp);
 	}
 }
