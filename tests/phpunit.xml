@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="bootstrap.php" colors="true" failOnWarning="true">
+  <testsuites>
+    <testsuite name="OpenOTP unit tests"><directory>Unit</directory></testsuite>
+    <testsuite name="OpenOTP integration tests"><directory>Integration</directory></testsuite>
+  </testsuites>
+</phpunit>

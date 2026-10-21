@@ -27,32 +27,28 @@ namespace OCA\OpenOTPAuth\Controller;
 
 use OCA\OpenOTPAuth\AuthService\OpenotpAuth;
 use OCA\OpenOTPAuth\Config;
-use OCA\OpenOTPAuth\Event\StateChanged;
 use OCA\OpenOTPAuth\Helper\RequestParamHelper;
+use OCA\OpenOTPAuth\Service\RegistrySynchronizer;
 use OCA\OpenOTPAuth\Settings\Admin\AdminSettings;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\AuthorizedAdminSetting;
 use OCP\AppFramework\Http\JSONResponse;
-use OCP\EventDispatcher\IEventDispatcher;
-// use OCP\Defaults;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\IRequest;
-use OCP\IUserBackend;
-use OCP\IUserManager;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class SettingsController extends Controller
 {
 	public function __construct(
-		private IEventDispatcher $eventDispatcher,
+		private RegistrySynchronizer $synchronizer,
 		private IAppManager $appManager,
 		private IAppConfig $appConfig,
 		private IL10N $l10n,
 		private LoggerInterface $logger,
-		protected IUserManager $userManager,
 		IRequest $request,
 		string $appName,
 	) {
@@ -61,10 +57,9 @@ class SettingsController extends Controller
 
 
 		/**
-		 * Nextcloud 32 version.
-		 * Standard saving process in Settings.
+		 * Save settings and synchronize the effective per-user 2FA states.
 		 *
-		 * @return JSONResponse<Http::STATUS_OK, array{code: string, status: string, message: string}, array<string, string>>
+		 * @return JSONResponse<Http::STATUS_OK|Http::STATUS_INTERNAL_SERVER_ERROR, array{code: string, status: string, message: string}, array<string, string>>
 		 */
 		#[AuthorizedAdminSetting(settings: AdminSettings::class)]
 		public function saveSettings(): JSONResponse {
@@ -82,59 +77,17 @@ class SettingsController extends Controller
 		$this->appConfig->setValueString(Config::APP_ID, 'rcdevsopenotp_server_url1',						RequestParamHelper::requestStringParam($this->request, 'rcdevsopenotp_server_url1'));
 		$this->appConfig->setValueString(Config::APP_ID, 'rcdevsopenotp_server_url2',						RequestParamHelper::requestStringParam($this->request, 'rcdevsopenotp_server_url2'));
 
-		switch ($authenticationMethod) {
-			case '0':
-				$stateChanged = false;
-				break;
-
-			case '1':
-				$stateChanged = true;
-				break;
-
-			default:
-				$stateChanged = null;
-				break;
-		}
-
-		// https://github.com/nextcloud/server/pull/9632
-		// Admins can enable or disable 2FA for all users, this change give the possibility to be "statefull" in other word
-		// we have to register enable/disable state for all users in IRegistry during plugin configuration (all user IRegistry will be populated at first config)						
-
-		/* @var $backend \OCP\UserInterface */
-		foreach ($this->userManager->getBackends() as $backend) {
-			if ($backend instanceof IUserBackend && $backend->getBackendName() === 'Database' && $this->request->getParam('rcdevsopenotp_disable_otp_local_users') === 'on') {
-				$limit = 500;
-				$offset = 0;
-				do {
-					$users = $backend->getUsers('', $limit, $offset);
-					foreach ($users as $user) {
-						$targetUser = $this->userManager->get($user);
-						if ($targetUser !== null) {
-							// $this->eventDispatcher->dispatch(StateChanged::class, new StateChanged($targetUser, false));
-							$this->eventDispatcher->dispatchTyped(new StateChanged($targetUser, false));
-						}
-					}
-					$offset += $limit;
-				} while (count($users) >= $limit);
-
-				continue;
-			}
-
-			$limit = 500;
-			$offset = 0;
-			do {
-				$users = $backend->getUsers('', $limit, $offset);
-				foreach ($users as $user) {
-					if (!is_null($stateChanged)) {
-						$targetUser = $this->userManager->get($user);
-						if ($targetUser !== null) {
-							// $this->eventDispatcher->dispatch(StateChanged::class, new StateChanged($targetUser, $stateChanged));
-							$this->eventDispatcher->dispatchTyped(new StateChanged($targetUser, $stateChanged));
-						}
-					}
-				}
-				$offset += $limit;
-			} while (count($users) >= $limit);
+		try {
+			// Always reconcile, even if the flags are unchanged: a previous
+			// attempt may have failed after updating only some users.
+			$this->synchronizer->synchronize();
+		} catch (Throwable $e) {
+			$this->logger->error('Could not synchronize the OpenOTP two-factor policy.', ['app' => Config::APP_ID, 'exception' => $e]);
+			return new JSONResponse([
+				'code' => '0',
+				'status' => 'error',
+				'message' => $this->l10n->t('OpenOTP settings were saved, but the two-factor policy could not be applied to all users. Save the settings again to retry.'),
+			], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
 		return new JSONResponse([

@@ -30,6 +30,12 @@ $requirements = [
 return [
 	'routes' => [
 		[
+			'name' => 'purge#purge',
+			'url' => '/api/{apiVersion}/settings/purge',
+			'verb' => 'POST',
+			'requirements' => $requirements,
+		],
+		[
 			'name' => 'page#index',
 			'url' => '/',
 			'verb' => 'GET',
