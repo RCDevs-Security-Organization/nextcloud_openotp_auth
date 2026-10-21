@@ -8,7 +8,7 @@ X.Y.Z
 
 -----------------------------------------
 1.35.0
-- Nextcloud 34 version
+- Nextcloud 35 version
 
 1.34.1
 - Synchronize OpenOTP two-factor registry states with the global administrator flags on settings save, installation and update.
