@@ -7,6 +7,23 @@ X.Y.Z
 - Z: minor or patch
 
 -----------------------------------------
+1.35.0
+- Nextcloud 34 version
+
+1.34.1
+- Synchronize OpenOTP two-factor registry states with the global administrator flags on settings save, installation and update.
+- Share the policy with first-login initialization; exclude only local Database accounts when requested.
+- Preserve other two-factor providers and report synchronization failures instead of a successful settings save.
+- Automatically migrate legacy rcdevsopenotp two-factor associations to openotp_auth on installation and update.
+- Preserve enabled two-factor authentication when both provider IDs exist; migrate in transactional, restartable batches.
+
+1.33.2
+- Synchronize OpenOTP two-factor registry states with the global administrator flags on settings save, installation and update.
+- Share the policy with first-login initialization; exclude only local Database accounts when requested.
+- Preserve other two-factor providers and report synchronization failures instead of a successful settings save.
+- Automatically migrate legacy rcdevsopenotp two-factor associations to openotp_auth on installation and update.
+- Preserve enabled two-factor authentication when both provider IDs exist; migrate in transactional, restartable batches.
+
 1.34.0
 - Nextcloud 34 version
 

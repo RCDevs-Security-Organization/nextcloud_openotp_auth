@@ -27,14 +27,12 @@ namespace OCA\OpenOTPAuth\Migration;
 
 use OCA\OpenOTPAuth\AppInfo\Application;
 use OCP\Authentication\TwoFactorAuth\IRegistry;
-use OCP\IConfig;
 use OCP\Migration\IOutput;
 use OCP\Migration\IRepairStep;
 
 class DisableTwoFactorOnAppDisable implements IRepairStep {
 	public function __construct(
 		private IRegistry $registry,
-		private IConfig $config,
 	) {
 	}
 
@@ -45,12 +43,6 @@ class DisableTwoFactorOnAppDisable implements IRepairStep {
 	public function run(IOutput $output): void {
 		$this->registry->cleanUp(Application::APP_ID);
 		$output->info('Removed OpenOTP two-factor provider associations.');
-
-		if ($this->config->getSystemValue('twofactor_enforced', 'false') === 'true') {
-			$this->config->setSystemValue('twofactor_enforced', 'false');
-			$this->config->setSystemValue('twofactor_enforced_groups', []);
-			$this->config->setSystemValue('twofactor_enforced_excluded_groups', []);
-			$output->info('Disabled enforced two-factor authentication.');
-		}
+		// OOA never enables the global 2FA policy, so it must not reset it.
 	}
 }

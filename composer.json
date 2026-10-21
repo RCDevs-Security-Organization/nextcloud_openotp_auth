@@ -1,7 +1,7 @@
 {
 	"name": "nextcloud/openotp_auth",
 	"description": "A two factor provider for Nextcloud",
-	"version": "1.34.0",
+	"version": "1.34.1",
 	"license": "agplv3",
 	"authors": [
 		{

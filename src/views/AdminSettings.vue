@@ -48,6 +48,7 @@
 		<h2>{{ getT('OpenOTP Two-Factor Authentication Settings') }}</h2>
 		<h3>{{ getT('Installed version') }} : {{ installedVersion }}</h3>
 
+		<fieldset :disabled="purgeInProgress || purgeFailed" class="openotp-settings-fields">
 		<opaSettingsContainer id="appName">
 			<opaSettingsHeader>
 				<opaItem>{{ getT('Enter your OpenOTP server settings in the fields below.') }}</opaItem>
@@ -64,12 +65,10 @@
 						<deleteIcon @click="resetValueAndCo('serverUrl1')">x</deleteIcon>
 					</opaItem>
 					<opaItem class="opaSettingsImage" @click="testConnection('1')">
-						<transition name="fade">
-							<img v-if="!reqServerUrl['1'].enable" class="opaClickable statusLoader" :src="disableImg" />
-							<img v-if="reqServerUrl['1'].request" class="opaClickable statusLoader statusRequest" :src="requestImg" />
-							<img v-if="!reqServerUrl['1'].request && reqServerUrl['1'].status" class="opaClickable statusLoader" :src="successImg" />
-							<img v-if="!reqServerUrl['1'].request && !reqServerUrl['1'].status" class="opaClickable statusLoader" :src="failureImg" />
-						</transition>
+						<img v-if="reqServerUrl['1'].request" class="opaClickable statusLoader statusRequest" :src="requestImg" />
+						<img v-else-if="!reqServerUrl['1'].enable" class="opaClickable statusLoader" :src="disableImg" />
+						<img v-else-if="reqServerUrl['1'].status" class="opaClickable statusLoader" :src="successImg" />
+						<img v-else class="opaClickable statusLoader" :src="failureImg" />
 					</opaItem>
 				</opaSettingsRow>
 			</opaSettingsPartsContainer>
@@ -84,12 +83,10 @@
 						<deleteIcon @click="resetValueAndCo('serverUrl2')">x</deleteIcon>
 					</opaItem>
 					<opaItem class="opaSettingsImage" @click="testConnection('2')">
-						<transition name="fade">
-							<img v-if="!reqServerUrl['2'].enable" class="opaClickable statusLoader" :src="disableImg" />
-							<img v-if="reqServerUrl['2'].request" class="opaClickable statusLoader statusRequest" :src="requestImg" />
-							<img v-if="!reqServerUrl['2'].request && reqServerUrl['2'].status" class="opaClickable statusLoader" :src="successImg" />
-							<img v-if="!reqServerUrl['2'].request && !reqServerUrl['2'].status" class="opaClickable statusLoader" :src="failureImg" />
-						</transition>
+						<img v-if="reqServerUrl['2'].request" class="opaClickable statusLoader statusRequest" :src="requestImg" />
+						<img v-else-if="!reqServerUrl['2'].enable" class="opaClickable statusLoader" :src="disableImg" />
+						<img v-else-if="reqServerUrl['2'].status" class="opaClickable statusLoader" :src="successImg" />
+						<img v-else class="opaClickable statusLoader" :src="failureImg" />
 					</opaItem>
 				</opaSettingsRow>
 			</opaSettingsPartsContainer>
@@ -205,12 +202,23 @@
 			</opaSettingsPartsContainer>
 		</opaSettingsContainer>
 
+		</fieldset>
+		<opaSettingsContainer v-if="isAdmin" id="purge">
+			<h3>{{ getT('Remove OpenOTP Auth') }}</h3>
+			<p>{{ getT('Purge disables and removes OpenOTP Auth and permanently deletes its settings for all users. Other authentication providers remain unchanged.') }}</p>
+			<button type="button" :disabled="purgeInProgress || purgeFailed || saveInProgress" @click="purgeApp">
+				{{ purgeInProgress ? getT('Removing OpenOTP Auth…') : getT('Purge') }}
+			</button>
+			<p v-if="purgeFailed" role="alert">{{ getT('Purge did not complete. OpenOTP may already be disabled or removed. Reload the page and check the application status and server logs before trying again.') }}</p>
+		</opaSettingsContainer>
 	</opaMain>
 </template>
 
 <script>
 import {loadState} from '@nextcloud/initial-state';
 import axios from '@nextcloud/axios';
+import {getCurrentUser} from '@nextcloud/auth';
+import {confirmPassword} from '@nextcloud/password-confirmation';
 import {showError, showSuccess} from '@nextcloud/dialogs';
 import {generateFilePath, generateUrl} from '@nextcloud/router';
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch';
@@ -256,6 +264,9 @@ export default {
 
 	data() {
 		return {
+			isAdmin: getCurrentUser()?.isAdmin === true,
+			purgeInProgress: false,
+			purgeFailed: false,
 			getT: getT,
 			checkServerUrl: checkServerUrl,
 			reqOpenOTP: [],
@@ -339,6 +350,37 @@ export default {
 	},
 
 	methods: {
+		async purgeApp() {
+			if (this.purgeInProgress || this.purgeFailed || this.saveInProgress) {
+				return;
+			}
+			if (!window.confirm(this.getT('Permanently remove OpenOTP Auth and all its administrator and user settings?'))) {
+				return;
+			}
+			this.purgeInProgress = true;
+			this.autosaveReady = false;
+			clearTimeout(this.saveTimeout);
+			this.saveTimeout = null;
+			this.saveAgain = false;
+			try {
+				await confirmPassword();
+			} catch {
+				this.purgeInProgress = false;
+				this.autosaveReady = true;
+				if (!this.saved) this.queueSaveSettings();
+				return;
+			}
+			try {
+				const response = await axios.post(generateUrl(baseUrl + '/api/v1/settings/purge'));
+				if (response.data?.status !== true) throw new Error('Purge failed');
+				window.location.assign(generateUrl('/settings/apps'));
+			} catch {
+				this.purgeFailed = true;
+				this.purgeInProgress = false;
+				showError(this.getT('OpenOTP purge did not complete'));
+			}
+		},
+
 		handleKeydown(event) {
 			if (event.key === 'Escape' && this.changelogOpen) {
 				this.closeChangelog();
@@ -540,6 +582,7 @@ export default {
 		},
 
 		saveSettings() {
+			if (!this.autosaveReady || this.purgeInProgress || this.purgeFailed) return;
 			if (this.saveInProgress) {
 				this.saveAgain = true;
 				return;
@@ -617,6 +660,12 @@ export default {
 </script>
 
 <style>
+.openotp-settings-fields {
+	border: 0;
+	padding: 0;
+	margin: 0;
+	min-width: 0;
+}
 @import '../styles/opaSettings.css';
 @import '../styles/rcdevsNxC.css';
 @import '../styles/utility.css';

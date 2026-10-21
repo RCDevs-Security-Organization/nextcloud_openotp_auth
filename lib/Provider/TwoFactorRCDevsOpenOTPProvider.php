@@ -29,6 +29,7 @@ use Exception;
 use OCA\OpenOTPAuth\AuthService\OpenotpAuth;
 use OCA\OpenOTPAuth\Config;
 use OCA\OpenOTPAuth\Helper\RequestParamHelper;
+use OCA\OpenOTPAuth\Service\AdminPolicy;
 use OCP\App\AppPathNotFoundException;
 use OCP\App\IAppManager;
 use OCP\Authentication\TwoFactorAuth\IProvider;
@@ -39,7 +40,6 @@ use OCP\IRequest;
 use OCP\ISession;
 use OCP\IURLGenerator;
 use OCP\IUser;
-use OCP\IUserBackend;
 use OCP\IUserManager;
 use OCP\Template\ITemplate;
 use OCP\Template\ITemplateManager;
@@ -64,6 +64,7 @@ class TwoFactorRCDevsOpenOTPProvider implements IProvider
 		private ISession $session,
 		private ITemplateManager $templateManager,
 		private IUserManager $userManager,
+		private AdminPolicy $policy,
 	) {
 	}
 
@@ -340,23 +341,6 @@ class TwoFactorRCDevsOpenOTPProvider implements IProvider
 	 */
 	public function isTwoFactorAuthEnabledForUser(IUser $user): bool
 	{
-		$disable_otp_local_users = $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_disable_otp_local_users');
-		$authentication_method = $this->appConfig->getValueString(Config::APP_ID, 'rcdevsopenotp_authentication_method');
-		// 0 => AUTHENTICATION_METHOD_STD (Standard)
-		// 1 => AUTHENTICATION_METHOD_OTP (OTP)
-
-		$backend = $user->getBackend();
-		if ($disable_otp_local_users === "on" && $backend instanceof IUserBackend && $backend->getBackendName() !== 'LDAP') {
-			$this->logger->info("2FA NOT ACTIVED", array('app' => Config::APP_ID));
-			return false;
-		}
-
-		if ($authentication_method === "1") {
-			$this->logger->info("2FA ACTIVED", array('app' => Config::APP_ID));
-			return true;
-		}
-
-		$this->logger->info("2FA NOT ACTIVED", array('app' => Config::APP_ID));
-		return false;
+		return $this->policy->isEnabledForUser($user);
 	}
 }
